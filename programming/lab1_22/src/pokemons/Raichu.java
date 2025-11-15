@@ -12,6 +12,6 @@ public class Raichu extends Pikachu {
         super(name, level);
         setStats(60, 90, 55, 90, 80, 110);
         setType(Type.ELECTRIC);
-        setMove(new Swagger(), new DoubleTeam(), new Slam(), new Facade());
+        addMove(new Facade());
     }
 }

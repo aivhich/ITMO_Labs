@@ -11,6 +11,6 @@ public class Pikachu extends Pichu {
         super(name, level);
         setStats(35, 55, 40, 50, 50, 90);
         setType(Type.ELECTRIC);
-        setMove(new Swagger(), new DoubleTeam(), new Slam());
+        addMove(new Slam());
     }
 }

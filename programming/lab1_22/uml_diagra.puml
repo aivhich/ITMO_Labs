@@ -1,0 +1,93 @@
+@startuml
+class attacks.physical.BoneRush {
+# void applyOppDamage(Pokemon,double)
+# String describe()
+}
+
+class pokemons.Pikachu {
+}
+class pokemons.Vullaby {
+~ Facade facade
+}
+
+class pokemons.Pichu {
+}
+class pokemons.Raichu {
+}
+class attacks.special.ShadowBall {
+# void applyOppDamage(Pokemon,double)
+# String describe()
+}
+
+class attacks.physical.FuryAttack {
+# void applyOppDamage(Pokemon,double)
+# String describe()
+}
+
+class attacks.special.SteamEruption {
+# void applyOppEffects(Pokemon)
+# String describe()
+}
+
+class pokemons.Mandibuzz {
+}
+class attacks.physical.FlameCharge {
+# void applySelfEffects(Pokemon)
+# String describe()
+}
+
+class pokemons.Volcanion {
+}
+class attacks.physical.Facade {
+# void applyOppDamage(Pokemon,double)
+# String describe()
+}
+
+class attacks.status_changers.DoubleTeam {
+# void applySelfEffects(Pokemon)
+# String describe()
+}
+
+class attacks.physical.Bulldoze {
+# void applyOppEffects(Pokemon)
+# String describe()
+}
+
+class attacks.physical.Slam {
+# String describe()
+}
+
+class attacks.status_changers.Swagger {
+# void applyOppEffects(Pokemon)
+# String describe()
+}
+
+class Main {
++ {static} void main(String[])
+}
+
+class attacks.special.SludgeWave {
+# void applyOppEffects(Pokemon)
+# String describe()
+}
+
+
+
+attacks.physical.PhysicalMove <|-- attacks.physical.BoneRush
+pokemons.Pichu <|-- pokemons.Pikachu
+ru.ifmo.se.pokemon.Pokemon <|-- pokemons.Vullaby
+ru.ifmo.se.pokemon.Pokemon <|-- pokemons.Pichu
+pokemons.Pikachu <|-- pokemons.Raichu
+ru.ifmo.se.pokemon.SpecialMove <|-- attacks.special.ShadowBall
+attacks.physical.PhysicalMove <|-- attacks.physical.FuryAttack
+ru.ifmo.se.pokemon.SpecialMove <|-- attacks.special.SteamEruption
+pokemons.Vullaby <|-- pokemons.Mandibuzz
+ru.ifmo.se.pokemon.PhysicalMove <|-- attacks.physical.FlameCharge
+ru.ifmo.se.pokemon.Pokemon <|-- pokemons.Volcanion
+ru.ifmo.se.pokemon.PhysicalMove <|-- attacks.physical.Facade
+ru.ifmo.se.pokemon.StatusMove <|-- attacks.status_changers.DoubleTeam
+ru.ifmo.se.pokemon.PhysicalMove <|-- attacks.physical.Bulldoze
+ru.ifmo.se.pokemon.PhysicalMove <|-- attacks.physical.Slam
+ru.ifmo.se.pokemon.StatusMove <|-- attacks.status_changers.Swagger
+attacks.special.SpecialMove <|-- attacks.special.SludgeWave
+@enduml

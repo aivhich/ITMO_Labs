@@ -1,0 +1,23 @@
+cd lab0
+chmod 777 bronzong5
+chmod 777 bronzong5/turtwig
+chmod 777 bronzong5/sunflora
+chmod 777 bronzong5/venipede
+chmod 777 bronzong5/infernape
+chmod 777 bronzong5/magnemite
+chmod 777 bronzong5/slowpoke
+chmod 777 charizard0
+chmod 777 charizard0/nidoking
+chmod 777 charizard0/larvitar
+chmod 777 charizard0/wobbuffet
+chmod 777 charizard0/treecko
+chmod 777 charizard0/lairon
+chmod 777 charizard0/golduck
+chmod 777 haunter5
+chmod 777 haunter5/larvesta
+chmod 777 haunter5/oshawott
+chmod 777 haunter5/vanilluxe
+chmod 777 haunter5/crawdaunt
+chmod 777 kingdra3
+chmod 777 meganium2
+chmod 777 porygon26

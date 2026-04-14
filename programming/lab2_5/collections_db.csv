@@ -1,0 +1,3 @@
+id,name,x,y,creationDate,enginePower,numberOfWheels,type,fuelType
+0,muha,10.0,10.0,2026-03-24T15:27:06.674Z,123.0,1,HELICOPTER,MANPOWER
+1,H12,10.0,10.0,2026-03-24T15:28:05.525Z,1000.0,2,HELICOPTER,NUCLEAR

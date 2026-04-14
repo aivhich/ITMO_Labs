@@ -1,0 +1,23 @@
+cd lab0
+chmod 752 bronzong5
+chmod 335 bronzong5/turtwig
+chmod u=rwx,g=wx,o=rw bronzong5/sunflora
+chmod u=rwx,g=wx,o=wx bronzong5/venipede
+chmod 064 bronzong5/infernape
+chmod 064 bronzong5/magnemite
+chmod u=wx,g=rw,o=x bronzong5/slowpoke
+chmod u=rwx,g=rwx,o=rwx charizard0
+chmod u=wx,g=x,o=w charizard0/nidoking
+chmod u=rwx,g=rwx,o=rwx charizard0/larvitar
+chmod 664 charizard0/wobbuffet
+chmod 624 charizard0/treecko
+chmod 006 charizard0/lairon
+chmod 044 charizard0/golduck
+chmod 751 haunter5
+chmod 511 haunter5/larvesta
+chmod 524 haunter5/oshawott
+chmod 363 haunter5/vanilluxe
+chmod u=rwx,g=rx,o=w haunter5/crawdaunt
+chmod 444 kingdra3
+chmod u=rw,g=,o=r meganium2
+chmod 400 porygon26

@@ -1,0 +1,228 @@
+@startuml
+' Настройки для вертикального расположения
+skinparam direction TB
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 50
+
+title UML Диаграмма Классов
+
+' ===== ПАКЕТ COMMANDS =====
+package "commands" <<Rectangle>> {
+    interface Command <<interface>> {
+        + run(args: String[]): Result
+    }
+
+    enum Result <<enumeration>> {
+        SUCCESS
+        FAIL
+    }
+
+    class Add
+    class Clear
+    class CountGreaterThanFuelType
+    class ExecuteScript
+    class Exit
+    class Help
+    class History
+    class Info
+    class PrintAscending
+    class PrintUniqueFuelType
+    class RemoveById
+    class RemoveHead
+    class RemoveLower
+    class Save
+    class Show
+    class Update
+}
+
+' ===== ПАКЕТ MANAGERS =====
+package "managers" <<Rectangle>> {
+    interface CommandManager <<interface>> {
+        + parseCommand(cmd: String): CommandObj
+        + getHistory(): ArrayList<CommandObj>
+        + run(cmd: String)
+        + registerCommands(Map<String, Command>)
+    }
+
+    interface IOManager <<interface>> {
+        + read(): String
+        + write(text: String)
+        + askString(text: String): String
+        + askInt(text: String): int
+        + askValue(initValue: T, input: Supplier<T>, validator: Predicate<T>): T
+    }
+
+    interface QueueManager <<interface>> {
+        + add(vehicle: Vehicle)
+        + size(): int
+        + getAll(): ArrayList<Vehicle>
+        + remove_by_id(id: int)
+        + clear()
+        + generateId(): int
+    }
+
+    interface StorageManager <<interface>> {
+        + save(queue: ArrayList<Vehicle>, path: String)
+        + load(path: String): List<Vehicle>
+    }
+
+    interface ValidateManager <<interface>> {
+        + checkNumValue(...): boolean
+        + checkStringValue(...): boolean
+    }
+
+    class CommandManagerImpl
+    class IOManagerImpl
+    class FileIOManagerImpl
+    class IOManagerStack
+    class QueueManagerImpl
+    class StorageManagerImpl
+    class ValidateManagerImpl
+
+    class ManagersLocator {
+        - services: Map<Class<?>, Object>
+        + register(type: Class<T>, instance: T)
+        + get(type: Class<T>): T
+    }
+}
+
+' ===== ПАКЕТ MODELS =====
+package "models" <<Rectangle>> {
+    class Vehicle {
+        - id: int
+        - name: String
+        - coordinates: Coordinates
+        - creationDate: Date
+        - enginePower: Float
+        - numberOfWheels: long
+        - type: VehicleType
+        - fuelType: FuelType
+        + compareTo(other: Vehicle): int
+        + toCsvString(): String
+    }
+
+    class Coordinates {
+        - x: Double
+        - y: Float
+    }
+
+    enum VehicleType <<enumeration>> {
+        HELICOPTER
+        MOTORCYCLE
+        CHOPPER
+        HOVERBOARD
+    }
+
+    enum FuelType <<enumeration>> {
+        KEROSENE
+        MANPOWER
+        NUCLEAR
+        PLASMA
+        ANTIMATTER
+    }
+}
+
+' ===== ПАКЕТ FACTORY =====
+package "factory" <<Rectangle>> {
+    class VehicleFactory {
+        - ioManager: IOManager
+        + createVehicle(): Vehicle
+        + updateVehicle(old: Vehicle): Vehicle
+    }
+
+    class CoordinatesFactory {
+        - ioManager: IOManager
+        + createCoordinates(): Coordinates
+        + updateCoordinates(old: Coordinates): Coordinates
+    }
+}
+
+' ===== ПАКЕТ UTILS =====
+package "utils" <<Rectangle>> {
+    class GenericBuilder<T>
+    class TerminalConfigurator
+    class CommandObj {
+        + name: String
+        + args: String[]
+    }
+}
+
+' ===== MAIN =====
+class Main
+
+' ===== СВЯЗИ - COMMANDS =====
+Command <|-- Add
+Command <|-- Clear
+Command <|-- CountGreaterThanFuelType
+Command <|-- ExecuteScript
+Command <|-- Exit
+Command <|-- Help
+Command <|-- History
+Command <|-- Info
+Command <|-- PrintAscending
+Command <|-- PrintUniqueFuelType
+Command <|-- RemoveById
+Command <|-- RemoveHead
+Command <|-- RemoveLower
+Command <|-- Save
+Command <|-- Show
+Command <|-- Update
+
+' ===== СВЯЗИ - MANAGERS =====
+CommandManager <|-- CommandManagerImpl
+IOManager <|-- IOManagerImpl
+IOManager <|-- FileIOManagerImpl
+QueueManager <|-- QueueManagerImpl
+StorageManager <|-- StorageManagerImpl
+ValidateManager <|-- ValidateManagerImpl
+
+' ===== СВЯЗИ - MODELS =====
+Vehicle *-- Coordinates
+Vehicle --> VehicleType
+Vehicle --> FuelType
+
+' ===== СВЯЗИ - FACTORY =====
+VehicleFactory --> IOManager
+VehicleFactory --> CoordinatesFactory
+CoordinatesFactory --> IOManager
+CoordinatesFactory --> ValidateManager
+
+' ===== СВЯЗИ - ОБЩИЕ =====
+Main --> ManagersLocator
+Main --> CommandManager
+Main --> IOManager
+Main --> StorageManager
+
+ManagersLocator --> CommandManager
+ManagersLocator --> IOManager
+ManagersLocator --> QueueManager
+ManagersLocator --> StorageManager
+ManagersLocator --> IOManagerStack
+
+IOManagerStack o-- IOManager
+
+CommandManagerImpl o-- Command
+CommandManagerImpl --> CommandObj
+
+QueueManagerImpl o-- Vehicle
+StorageManagerImpl --> Vehicle
+
+Add --> ManagersLocator
+Clear --> ManagersLocator
+Update --> ManagersLocator
+RemoveById --> ManagersLocator
+ExecuteScript --> IOManagerStack
+
+' ===== ЛЕГЕНДА =====
+note bottom of Main
+    **Паттерны:**
+    - Command (команды)
+    - Service Locator (ManagersLocator)
+    - Factory (VehicleFactory)
+    - Builder (GenericBuilder)
+end note
+
+@enduml

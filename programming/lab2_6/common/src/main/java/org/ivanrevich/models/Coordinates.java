@@ -1,6 +1,8 @@
 package org.ivanrevich.models;
 
 
+import java.io.Serializable;
+
 /**
  * Модель координат.
  * <p>
@@ -11,7 +13,7 @@ package org.ivanrevich.models;
  * @author Ivan Prokhorevich
  * @version 1.0
  */
-public class Coordinates {
+public class Coordinates implements Serializable {
     private Double x; //Значение поля должно быть больше -371, Поле не может быть null
     private Float y; //Максимальное значение поля: 376, Поле не может быть null
 

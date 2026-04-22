@@ -1,5 +1,6 @@
 package org.ivanrevich.models;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
@@ -20,7 +21,7 @@ import java.util.Objects;
  * @see FuelType
  * @see Comparable
  */
-public class Vehicle implements Comparable<Vehicle>{
+public class Vehicle implements Comparable<Vehicle>, Serializable {
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null

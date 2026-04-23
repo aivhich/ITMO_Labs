@@ -1,18 +1,20 @@
 package org.ivanrevich.commands;
 
-/**
- * Перечисление результатов выполнения команды.
- * <p>
- * Используется для индикации успеха или неудачи выполнения команды.
- * </p>
- *
- * @author Ivan Prokhorevich
- * @version 1.0
- */
-public enum Result {
-    /** Команда выполнена успешно */
-    SUCCESS,
+public class Result {
+    private org.ivanrevich.utils.ResultCode resultCode;
+    private String message;
 
-    /** При выполнении команды произошла ошибка */
-    FAIL
+    public Result(org.ivanrevich.utils.ResultCode resultCode, String message) {
+        this.resultCode = resultCode;
+        this.message = message;
+    }
+
+    public org.ivanrevich.utils.ResultCode getResultCode() {
+        return resultCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
 }

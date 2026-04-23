@@ -20,6 +20,6 @@ public interface Command {
      * @return {@link Result#SUCCESS} если команда выполнена успешно,
      *         {@link Result#FAIL} если произошла ошибка
      */
-    Result run(String[] args);
+    Result run(Object[] args);
 }
 

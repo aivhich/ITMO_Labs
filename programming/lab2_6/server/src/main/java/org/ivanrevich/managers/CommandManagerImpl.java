@@ -2,13 +2,12 @@ package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
 import org.ivanrevich.commands.Result;
+import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.exceptions.Exceptions;
+import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.CommandObj;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Реализация менеджера команд.
@@ -32,16 +31,24 @@ public class CommandManagerImpl implements CommandManager{
     }
 
     @Override
+    @Deprecated
     public void run(String cmd) {
         CommandObj parsedCommand = CommandManager.parseCommand(cmd);
         if(availableCommands.containsKey(parsedCommand.name())){
-            if( Result.SUCCESS != availableCommands.get(parsedCommand.name()).run(parsedCommand.args())){
+            if( ResultCode.SUCCESS != availableCommands.get(parsedCommand.name()).run(parsedCommand.args()).getResultCode()){
                 System.out.println("Command doesn't return success code");
             }
             history.add(parsedCommand);
             return;
         }
         throw new RuntimeException(Exceptions.COMMAND_NOT_FOUND);
+    }
+
+    @Override
+    public Result run(Request r) {
+        Result resultCode = availableCommands.get(r.getCommandType().getName()).run(r.getArgs().toArray(new Object[0]));
+        history.add(new CommandObj(r.getCommandType().getName(), new String[]{}));
+        return resultCode;
     }
 
     @Override

@@ -53,14 +53,14 @@ public interface CommandManager {
      */
     ArrayList<CommandObj> getHistory();
 
+
+//    void run(String cmd);
     /**
      * Выполняет команду по строке.
      *
-     * @param cmd строка команды для выполнения
+     * @param r запрос для выполнения команды
      */
-    void run(String cmd);
-
-    Result run(Request r);
+    Result<?> run(Request<?> r);
 
     /**
      * Возвращает все зарегистрированные команды.

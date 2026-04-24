@@ -1,9 +1,5 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.exceptions.Exceptions;
-import org.ivanrevich.managers.FileIOManagerImpl;
-import org.ivanrevich.managers.IOManager;
-import org.ivanrevich.managers.IOManagerStack;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
@@ -13,14 +9,11 @@ import org.ivanrevich.utils.ResultCode;
  * Команда выполнения скрипта из файла.
  * <p>
  * Считывает команды из указанного файла и исполняет их последовательно.
- * Использует {@link IOManagerStack} для переключения источника ввода.
  * </p>
  *
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see Command
- * @see FileIOManagerImpl
- * @see IOManagerStack
  */
 public class ExecuteScript implements Command{
     private final ManagersLocator locator;
@@ -31,7 +24,7 @@ public class ExecuteScript implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
-        IOManagerStack stack = locator.get(IOManagerStack.class);
+        //IOManagerStack stack = locator.get(IOManagerStack.class);
 
         //if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
         //TODO

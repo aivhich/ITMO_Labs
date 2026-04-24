@@ -1,7 +1,5 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.factory.VehicleFactory;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
@@ -22,7 +20,6 @@ import java.util.Iterator;
  * @version 1.0
  * @see Command
  * @see Vehicle
- * @see VehicleFactory
  */
 public class RemoveLower implements Command{
     private final  ManagersLocator managersLocator;

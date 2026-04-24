@@ -1,10 +1,10 @@
 package org.ivanrevich.factory;
 
-import org.ivanrevich.managers.IOManager;
-import org.ivanrevich.managers.ValidateManager;
-import org.ivanrevich.managers.ValidateManagerImpl;
+import org.ivanrevich.manager.IOManager;
 import org.ivanrevich.models.Coordinates;
 import org.ivanrevich.utils.GenericBuilder;
+import org.ivanrevich.validators.ValidateManager;
+import org.ivanrevich.validators.ValidateManagerImpl;
 
 /**
  * Фабрика для создания и обновления координат.
@@ -15,7 +15,6 @@ import org.ivanrevich.utils.GenericBuilder;
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see Coordinates
- * @see ValidateManager
  */
 public class CoordinatesFactory {
     private final IOManager ioManager;

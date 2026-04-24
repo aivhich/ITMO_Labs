@@ -14,6 +14,7 @@ public class CommandHandler {
     public void run(Request r){
         CommandManager commandManager = managersLocator.get(CommandManager.class);
 
-        commandManager.run(r.getCommandType().getName());
+        // here may be will be validation
+        commandManager.run(r);
     }
 }

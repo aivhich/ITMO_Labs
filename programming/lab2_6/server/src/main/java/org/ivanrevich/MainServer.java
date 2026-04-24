@@ -12,15 +12,15 @@ public class MainServer {
 
         String path = args[1];
 
-        IOManager ioManager = new IOManagerImpl(false);
-        IOManagerStack ioStack = new IOManagerStack(ioManager);
+//        IOManager ioManager = new IOManagerImpl(false);
+//        IOManagerStack ioStack = new IOManagerStack(ioManager);
         QueueManager queueManager = new QueueManagerImpl();
         StorageManager storageManager = new StorageManagerImpl(path, queueManager);
 
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(StorageManager.class, storageManager);
-        managersLocator.register(IOManagerStack.class, ioStack);
-        managersLocator.register(IOManager.class, ioManager);
+//        managersLocator.register(IOManagerStack.class, ioStack);
+//        managersLocator.register(IOManager.class, ioManager);
         managersLocator.register(QueueManager.class, queueManager);
 
 

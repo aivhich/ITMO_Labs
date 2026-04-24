@@ -1,6 +1,5 @@
-package org.ivanrevich.managers;
+package org.ivanrevich.manager;
 
-import org.ivanrevich.commands.ExecuteScript;
 import org.ivanrevich.exceptions.Exceptions;
 
 import java.io.*;
@@ -19,7 +18,6 @@ import static org.ivanrevich.validators.FileValidator.validateScriptFile;
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see IOManager
- * @see ExecuteScript
  */
 public class FileIOManagerImpl implements IOManager{
     private FileInputStream fis;

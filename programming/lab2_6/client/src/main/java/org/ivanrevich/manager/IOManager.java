@@ -1,4 +1,5 @@
-package org.ivanrevich.managers;
+package org.ivanrevich.manager;
+
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;

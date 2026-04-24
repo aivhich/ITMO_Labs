@@ -6,6 +6,7 @@ import org.ivanrevich.models.FuelType;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.models.VehicleType;
 import org.ivanrevich.utils.GenericBuilder;
+import org.ivanrevich.validators.ValidateManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +56,7 @@ public class StorageManagerImpl implements StorageManager {
     @Override
     public List<Vehicle> load(String path) {
         validateCollectionNewFile(path, ".csv", true);
-        ValidateManager validator = new ValidateManagerImpl();
+        ValidateManager validator = new org.ivanrevich.validators.ValidateManagerImpl();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
                     new FileInputStream(path),

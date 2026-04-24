@@ -14,9 +14,9 @@ import java.util.Set;
 
 public class Server {
     private final DatagramChannel channel;
-    private Selector selector;
+    private final Selector selector;
     private boolean running;
-    private ManagersLocator managersLocator;
+    private final ManagersLocator managersLocator;
 
     public Server(int port, ManagersLocator managersLocator) throws Exception {
         selector = Selector.open();

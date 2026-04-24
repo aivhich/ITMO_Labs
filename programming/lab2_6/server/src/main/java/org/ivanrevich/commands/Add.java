@@ -1,6 +1,5 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.factory.VehicleFactory;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
@@ -11,7 +10,7 @@ import org.ivanrevich.responses.Result;
 /**
  * Команда добавления нового транспортного средства в коллекцию.
  * <p>
- * Создаёт новый объект {@link Vehicle} через {@link VehicleFactory}
+ * Создаёт новый объект {@link Vehicle}
  * и добавляет его в коллекцию через {@link QueueManager}.
  * </p>
  *
@@ -19,7 +18,6 @@ import org.ivanrevich.responses.Result;
  * @version 1.0
  * @see Command
  * @see Vehicle
- * @see VehicleFactory
  */
 public class Add implements Command {
     /** Локатор менеджеров для получения зависимостей */

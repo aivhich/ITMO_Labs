@@ -1,8 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.exceptions.Exceptions;
-import org.ivanrevich.factory.VehicleFactory;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
@@ -20,7 +18,6 @@ import org.ivanrevich.utils.ResultCode;
  * @version 1.0
  * @see Command
  * @see Vehicle
- * @see VehicleFactory
  */
 public class Update implements Command{
     private final ManagersLocator managersLocator;

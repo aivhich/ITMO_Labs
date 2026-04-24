@@ -1,7 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.CommandManager;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.CommandObj;

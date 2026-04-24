@@ -1,12 +1,12 @@
 package org.ivanrevich.factory;
 
-import org.ivanrevich.managers.IOManager;
-import org.ivanrevich.managers.ValidateManager;
-import org.ivanrevich.managers.ValidateManagerImpl;
+import org.ivanrevich.manager.IOManager;
 import org.ivanrevich.models.FuelType;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.models.VehicleType;
 import org.ivanrevich.utils.GenericBuilder;
+import org.ivanrevich.validators.ValidateManager;
+import org.ivanrevich.validators.ValidateManagerImpl;
 
 import java.time.Instant;
 import java.util.Date;
@@ -14,14 +14,12 @@ import java.util.Objects;
 /**
  * Фабрика для создания и обновления транспортных средств.
  * <p>
- * Использует {@link IOManager} для ввода данных пользователем
  * и {@link GenericBuilder} для построения объектов.
  * </p>
  *
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see Vehicle
- * @see CoordinatesFactory
  * @see GenericBuilder
  */
 public class VehicleFactory {

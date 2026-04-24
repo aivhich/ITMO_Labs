@@ -30,19 +30,19 @@ public class CommandManagerImpl implements CommandManager{
         return history;
     }
 
-    @Override
-    @Deprecated
-    public void run(String cmd) {
-        CommandObj parsedCommand = CommandManager.parseCommand(cmd);
-        if(availableCommands.containsKey(parsedCommand.name())){
-            if( ResultCode.SUCCESS != availableCommands.get(parsedCommand.name()).run(parsedCommand.args()).getResultCode()){
-                System.out.println("Command doesn't return success code");
-            }
-            history.add(parsedCommand);
-            return;
-        }
-        throw new RuntimeException(Exceptions.COMMAND_NOT_FOUND);
-    }
+//    @Override
+//    @Deprecated
+//    public void run(String cmd) {
+//        CommandObj parsedCommand = CommandManager.parseCommand(cmd);
+//        if(availableCommands.containsKey(parsedCommand.name())){
+//            if( ResultCode.SUCCESS != availableCommands.get(parsedCommand.name()).run(parsedCommand.args()).getResultCode()){
+//                System.out.println("Command doesn't return success code");
+//            }
+//            history.add(parsedCommand);
+//            return;
+//        }
+//        throw new RuntimeException(Exceptions.COMMAND_NOT_FOUND);
+//    }
 
     @Override
     public Result<?> run(Request r) {

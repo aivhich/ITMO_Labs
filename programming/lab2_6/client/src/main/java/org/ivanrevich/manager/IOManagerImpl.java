@@ -1,4 +1,4 @@
-package org.ivanrevich.managers;
+package org.ivanrevich.manager;
 
 import org.ivanrevich.exceptions.Exceptions;
 

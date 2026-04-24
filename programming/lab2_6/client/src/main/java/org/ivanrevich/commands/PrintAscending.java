@@ -1,15 +1,19 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.manager.IOManager;
 import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.network.Client;
+import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Response;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.ivanrevich.responses.Result;
 /**
  * Команда вывода элементов коллекции в порядке возрастания.
  * <p>
@@ -31,13 +35,22 @@ public class PrintAscending implements Command{
     }
 
     @Override
-    public Result<?> run(Request<?> r) {
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-//        IOManager ioManager = managersLocator.get(IOManager.class);
-        List<Vehicle> vehicleList = new ArrayList<>(queueManager.getAll());
-        Collections.sort(vehicleList);
-//        vehicleList.forEach(vehicle -> ioManager.write(vehicle.toString()));
-        return new Result<>(ResultCode.SUCCESS, "Success", vehicleList);
+    public ResultCode run(String[] args) {
+        //QueueManager queueManager = managersLocator.get(QueueManager.class);
+        IOManager ioManager = managersLocator.get(IOManager.class);
+        Client client = managersLocator.get(Client.class);
+
+        try {
+            Response<List<Vehicle>> r = (Response<List<Vehicle>>) client.sendObject(new Request<>(CommandType.PRINT_ASCENDING, null));
+            for(Vehicle v: r.getBody()){
+                ioManager.write(v.toString());
+            }
+            return r.getResultCode();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

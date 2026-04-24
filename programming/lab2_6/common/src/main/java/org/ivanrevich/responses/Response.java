@@ -25,4 +25,8 @@ public class Response<T> implements Serializable {
     public String getMessage() {
         return message;
     }
+
+    public T getBody() {
+        return body;
+    }
 }

@@ -1,4 +1,4 @@
-package org.ivanrevich.managers;
+package org.ivanrevich;
 
 import java.util.HashMap;
 import java.util.Map;

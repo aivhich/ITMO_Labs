@@ -4,10 +4,9 @@ import org.ivanrevich.managers.*;
 import org.ivanrevich.requests.Request;
 
 public class CommandHandler {
-    private ManagersLocator managersLocator;
-
-
-    public CommandHandler(ManagersLocator managersLocator) {
+    private org.ivanrevich.ManagersLocator managersLocator;
+    //TODO DELETE
+    public CommandHandler(org.ivanrevich.ManagersLocator managersLocator) {
         this.managersLocator = managersLocator;
     }
 

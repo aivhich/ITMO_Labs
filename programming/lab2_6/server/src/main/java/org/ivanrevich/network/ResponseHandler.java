@@ -5,17 +5,24 @@ import org.ivanrevich.responses.Response;
 import org.ivanrevich.utils.Serializer;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 public class ResponseHandler {
-    public static void apply(SelectionKey key, Result<?> result) throws IOException {
+    public static void apply(SelectionKey key, Result<?> result, InetSocketAddress clientAddress) throws IOException {
         DatagramChannel dc = (DatagramChannel) key.channel();
 
-        ByteBuffer data = (new Serializer()).serialize(new Response<>(result.getResultCode(), result.getMessage(), result.getOutput()));
+        Serializer serializer = new Serializer();
+        Response<?> response = new Response<>(
+                result.getResultCode(),
+                result.getMessage(),
+                result.getOutput()
+        );
+        ByteBuffer data = serializer.serialize(response);
 
-        // Отправка ответа сразу (UDP не требует OP_WRITE, можно писать напрямую)
-        dc.send(data, dc.getRemoteAddress());
+        // UDP: отправляем датаграмму обратно клиенту
+        dc.send(data, clientAddress);
     }
 }

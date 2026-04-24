@@ -23,10 +23,10 @@ public class Exit implements Command{
     }
 
     @Override
-    public Result<?> run(Request<?> request) {
+    public ResultCode run(String [] args) {
         System.exit(0);
         //TODO
-        return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
+        return ResultCode.SUCCESS;
     }
 
     @Override

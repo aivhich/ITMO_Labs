@@ -1,5 +1,7 @@
 package org.ivanrevich.network;
 
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Response;
 import org.ivanrevich.utils.Deserializer;
 import org.ivanrevich.utils.Serializer;
 
@@ -17,19 +19,18 @@ public class Client {
         socket.connect(remoteServer);
     }
 
-    public void sendObject(Object obj) throws IOException, ClassNotFoundException {
+    public Response<?> sendObject(Request<?> request) throws IOException, ClassNotFoundException {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         Serializer serializer = new Serializer();
-        buffer.put(serializer.serialize(obj));
+        buffer.put(serializer.serialize(request));
         buffer.flip();
         DatagramPacket packet = new DatagramPacket(buffer.array(), buffer.limit());
         socket.send(packet);
-//
-//
-//        ByteBuffer buffer2 = ByteBuffer.allocate(1024);
-//        DatagramPacket packet2 = new DatagramPacket(buffer2.array(), buffer2.limit());
-//        socket.receive(packet2);
-//        return (new Deserializer()).deserialize(packet2.getData());
+
+        ByteBuffer buffer2 = ByteBuffer.allocate(1024);
+        DatagramPacket packet2 = new DatagramPacket(buffer2.array(), buffer2.limit());
+        socket.receive(packet2);
+        return (Response<?>) (new Deserializer()).deserialize(packet2.getData());
     }
 
     public void sendMessage(String message) throws IOException {

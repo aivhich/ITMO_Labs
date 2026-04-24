@@ -1,6 +1,6 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.ManagersLocator;
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
 
@@ -32,15 +32,7 @@ public class Show implements Command{
     @Override
     public Result<?> run(Request<?> r) {
         QueueManager queueManager =  managersLocator.get(QueueManager.class);
-//        IOManager ioManager = managersLocator.get(IOManager.class);
-
         PriorityQueue<Vehicle> vehicles = queueManager.getAll();
-//        for(Vehicle v: vehicles) {
-//            ioManager.write(v.toString());
-//        }
-//        if(vehicles.isEmpty()){
-//            ioManager.write("Priority queue is empty");
-//        }
         return new Result<>(ResultCode.SUCCESS, "Success", vehicles);
     }
 

@@ -3,6 +3,7 @@ package org.ivanrevich;
 import org.ivanrevich.commands.*;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Server;
+import org.ivanrevich.requests.CommandType;
 
 import java.util.Map;
 
@@ -12,15 +13,11 @@ public class MainServer {
 
         String path = args[1];
 
-//        IOManager ioManager = new IOManagerImpl(false);
-//        IOManagerStack ioStack = new IOManagerStack(ioManager);
         QueueManager queueManager = new QueueManagerImpl();
         StorageManager storageManager = new StorageManagerImpl(path, queueManager);
 
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(StorageManager.class, storageManager);
-//        managersLocator.register(IOManagerStack.class, ioStack);
-//        managersLocator.register(IOManager.class, ioManager);
         managersLocator.register(QueueManager.class, queueManager);
 
 
@@ -29,22 +26,22 @@ public class MainServer {
 
         commandManager.registerCommands(
                 Map.ofEntries(
-                        Map.entry("add", new Add(managersLocator)),
-                        Map.entry("clear", new Clear(managersLocator)),
-                        Map.entry("count_greater_than_fuel_type", new CountGreaterThanFuelType(managersLocator)),
-                        Map.entry("execute_script", new ExecuteScript(managersLocator)),
-                        Map.entry("exit", new Exit(managersLocator)),
-                        Map.entry("help", new Help(managersLocator)),
-                        Map.entry("history", new History(managersLocator)),
-                        Map.entry("info", new Info(managersLocator)),
-                        Map.entry("print_ascending", new PrintAscending(managersLocator)),
-                        Map.entry("print_unique_fuel_type", new PrintUniqueFuelType(managersLocator)),
-                        Map.entry("remove_by_id", new RemoveById(managersLocator)),
-                        Map.entry("remove_head", new RemoveHead(managersLocator)),
-                        Map.entry("remove_lower", new RemoveLower(managersLocator)),
-                        Map.entry("save", new Save(managersLocator, path)),
-                        Map.entry("show", new Show(managersLocator)),
-                        Map.entry("update", new Update(managersLocator))
+                        Map.entry(CommandType.ADD.getName(), new Add(managersLocator)),
+                        Map.entry(CommandType.CLEAR.getName(), new Clear(managersLocator)),
+                        Map.entry(CommandType.COUNT_GREATER_THAN_FUEL_TYPE.getName(), new CountGreaterThanFuelType(managersLocator)),
+                        Map.entry(CommandType.EXECUTE.getName(), new ExecuteScript(managersLocator)),
+                        Map.entry(CommandType.EXIT.getName(), new Exit(managersLocator)),
+                        Map.entry(CommandType.HELP.getName(), new Help(managersLocator)),
+                        Map.entry(CommandType.HISTORY.getName(), new History(managersLocator)),
+                        Map.entry(CommandType.INFO.getName(), new Info(managersLocator)),
+                        Map.entry(CommandType.PRINT_ASCENDING.getName(), new PrintAscending(managersLocator)),
+                        Map.entry(CommandType.PRINT_UNIQUE_FUEL_TYPE.getName(), new PrintUniqueFuelType(managersLocator)),
+                        Map.entry(CommandType.REMOVE_BY_ID.getName(), new RemoveById(managersLocator)),
+                        Map.entry(CommandType.REMOVE_HEAD.getName(), new RemoveHead(managersLocator)),
+                        Map.entry(CommandType.REMOVE_LOWER.getName(), new RemoveLower(managersLocator)),
+                        Map.entry(CommandType.SAVE.getName(), new Save(managersLocator, path)),
+                        Map.entry(CommandType.SHOW.getName(), new Show(managersLocator)),
+                        Map.entry(CommandType.UPDATE.getName(), new Update(managersLocator))
                 )
         );
 

@@ -23,7 +23,7 @@ public class ExecuteScript implements Command{
     }
 
     @Override
-    public Result<?> run(Request<?> r) {
+    public ResultCode run(String[] args) {
         //IOManagerStack stack = locator.get(IOManagerStack.class);
 
         //if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
@@ -33,7 +33,8 @@ public class ExecuteScript implements Command{
         //stack.push(fileIO);
         //locator.register(IOManager.class, fileIO);
 
-        return new Result(ResultCode.SUCCESS, "Success", "");
+        return ResultCode.SUCCESS;
+
     }
 
     @Override

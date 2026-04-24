@@ -1,26 +1,21 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.QueueManager;
-import org.ivanrevich.managers.StorageManager;
-
-import java.util.ArrayList;
-
+import org.ivanrevich.manager.IOManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
+import java.util.ArrayList;
+
 /**
  * Команда сохранения коллекции в файл.
  * <p>
- * Сохраняет текущее состояние коллекции в CSV-файл через {@link StorageManager}.
  * </p>
  *
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see Command
- * @see StorageManager
- * @see QueueManager
  */
 public class Save implements Command{
     private final ManagersLocator managersLocator;
@@ -32,17 +27,14 @@ public class Save implements Command{
     }
 
     @Override
-    public Result<?> run(Request<?> r) {
-        StorageManager storageManager = managersLocator.get(StorageManager.class);
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
+    public ResultCode run(String[] args) {
 //        IOManager ioManager = managersLocator.get(IOManager.class);
-        //TODO WATCH DOCS
-        //if(args.length==1) path=args[0];
+//        if(args.length==1) path=args[0];
+//
+//        storageManager.save(new ArrayList<>(queueManager.getAll()), path);
+////        ioManager.write("Saved "+path);
 
-        storageManager.save(new ArrayList<>(queueManager.getAll()), path);
-//        ioManager.write("Saved "+path);
-
-        return new Result(ResultCode.SUCCESS, "Success", path);
+        return ResultCode.SUCCESS;
     }
 
     @Override

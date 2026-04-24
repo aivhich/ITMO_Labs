@@ -2,15 +2,13 @@ package org.ivanrevich.network;
 
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.managers.CommandManager;
-import org.ivanrevich.managers.ManagersLocator;
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.requests.Request;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.Set;
-
-
 
 public class Server {
     private final DatagramChannel channel;
@@ -40,9 +38,14 @@ public class Server {
                 if (!key.isValid()) continue;
 
                 if (key.isReadable()) {
-                    Request<?> r = RequestHandler.apply(key);
-                    Result<?> result = commandManager.run(r);
-                    ResponseHandler.apply(key, result);
+                    ReadResult readResult = RequestHandler.apply(key);
+                    if (readResult == null) continue;
+
+                    Request<?> request = readResult.request();
+                    InetSocketAddress sender = readResult.senderAddress();
+
+                    Result<?> result = commandManager.run(request);
+                    ResponseHandler.apply(key, result, sender);
                 }
             }
         }

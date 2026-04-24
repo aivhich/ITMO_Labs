@@ -1,11 +1,15 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.exceptions.Exceptions;
+import org.ivanrevich.network.Client;
+import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
-import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Response;
 import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
+
+import java.io.IOException;
 
 /**
  * Команда удаления элемента по идентификатору.
@@ -16,26 +20,28 @@ import org.ivanrevich.responses.Result;
  * @author Ivan Prokhorevich
  * @version 1.0
  * @see Command
- * @see QueueManager
  */
 public class RemoveById implements Command{
-    private ManagersLocator managersLocator;
+    private final ManagersLocator managersLocator;
 
     public RemoveById(ManagersLocator managersLocator) {
         this.managersLocator = managersLocator;
     }
 
     @Override
-    public Result<?> run(Request<?> r) {
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-
+    public ResultCode run(String[]  args) {
+        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        Client client = managersLocator.get(Client.class);
         try {
-            int id = Integer.parseInt(String.valueOf(r.getArgs()));
-            queueManager.remove_by_id(id);
-
-            return new Result<>(ResultCode.SUCCESS, "Success", id);
+            int id = Integer.parseInt(String.valueOf(args[0]));
+            Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_BY_ID, null));
+            return r.getResultCode();
         } catch (NumberFormatException e) {
             throw new RuntimeException(Exceptions.INVALID_ARGS);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

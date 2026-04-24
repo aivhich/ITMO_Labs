@@ -1,7 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.CommandManager;
-import org.ivanrevich.managers.ManagersLocator;
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.CommandObj;
 import org.ivanrevich.utils.ResultCode;
@@ -53,9 +53,9 @@ public class History implements Command{
         int startIdx = fullHistory.size()-(i);
         if(startIdx<0) startIdx=0;
 
-//        for (CommandObj commandObj : fullHistory.subList(startIdx, fullHistory.size())) {
-//            ioManager.write(commandObj.name());
-//        }
+//      for (CommandObj commandObj : fullHistory.subList(startIdx, fullHistory.size())) {
+//          ioManager.write(commandObj.name());
+//      }
 
         return new Result<>(ResultCode.SUCCESS, "Success", fullHistory.subList(startIdx, fullHistory.size()));
     }

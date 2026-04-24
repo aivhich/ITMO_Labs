@@ -1,10 +1,16 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.manager.IOManager;
+import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.network.Client;
+import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Response;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
+
+import java.io.IOException;
 
 /**
  * Команда удаления и вывода первого элемента коллекции.
@@ -15,7 +21,6 @@ import org.ivanrevich.utils.ResultCode;
  * @author Ivan Revich
  * @version 1.0
  * @see Command
- * @see QueueManager
  */
 public class RemoveHead implements Command{
     private final ManagersLocator managersLocator;
@@ -30,10 +35,18 @@ public class RemoveHead implements Command{
     }
 
     @Override
-    public Result<?> run(Request<?> request) {
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-        //IOManager ioManager = managersLocator.get(IOManager.class);
-        //ioManager.write(queueManager.remove_head().toString());
-        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head().toString());
+    public ResultCode run(String[] args) {
+        IOManager ioManager = managersLocator.get(IOManager.class);
+        Client client = managersLocator.get(Client.class);
+
+        try {
+            Response<Vehicle> r = (Response<Vehicle>) client.sendObject(new Request<>(CommandType.REMOVE_HEAD, null));
+            ioManager.write(r.getBody().toString());
+            return r.getResultCode();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

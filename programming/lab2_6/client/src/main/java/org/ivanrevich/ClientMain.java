@@ -9,5 +9,7 @@ public class ClientMain {
     public static void main(String[] args) throws Exception {
         Client client = new Client(new InetSocketAddress("localhost", 8000));
         client.sendObject(new Vehicle(0));
+
+        //here will be client
     }
 }

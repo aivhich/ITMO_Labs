@@ -1,11 +1,12 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.factory.VehicleFactory;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
-
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Result;
 
 /**
  * Команда добавления нового транспортного средства в коллекцию.
@@ -45,18 +46,17 @@ public class Add implements Command {
      * и добавляет его в коллекцию.
      * </p>
      *
-     * @param args аргументы команды (не используются)
-     * @return {@link Result#SUCCESS} после успешного добавления
+     * @param r аргументы команды
+     * @return {@link ResultCode#SUCCESS} после успешного добавления
      */
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-
-        Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
+        //IOManager ioManager = managersLocator.get(IOManager.class);
+        //Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
+        Vehicle vehicle = (Vehicle) r.getArgs();
         queueManager.add(vehicle);
-
-        ioManager.write("Successfully created vehicle");
-        return Result.SUCCESS;
+        ///ioManager.write("Successfully created vehicle"); @DEPRECATED
+        return new Result<Vehicle>(ResultCode.SUCCESS, "Successfully created vehicle", vehicle);
     }
 }

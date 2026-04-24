@@ -1,7 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.exceptions.Exceptions;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.FuelType;
@@ -9,6 +8,9 @@ import org.ivanrevich.models.Vehicle;
 
 import java.util.PriorityQueue;
 
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 
 /**
@@ -28,21 +30,21 @@ public class CountGreaterThanFuelType implements Command{
     private final ManagersLocator managersLocator;
 
     @Override
-    public Result run(String[] args) {
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+    public Result<?> run(Request<?> request) {
+        //TODO if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
 
         try {
-            FuelType fuelType = FuelType.valueOf(args[0]);
+            FuelType fuelType = (FuelType) request.getArgs();//FuelType.valueOf(args[0]);
             QueueManager queueManager = managersLocator.get(QueueManager.class);
-            IOManager ioManager = managersLocator.get(IOManager.class);
+//            IOManager ioManager = managersLocator.get(IOManager.class);
 
             PriorityQueue<Vehicle> vehicleList =  queueManager.getAll();
             long count = vehicleList.stream()
                     .filter(vehicle -> vehicle.getFuelType().ordinal()>fuelType.ordinal())
                     .count();
 
-            ioManager.write(String.format("There %s fuel type greater that it", count));
-            return Result.SUCCESS;
+//            ioManager.write(String.format("There %s fuel type greater that it", count));
+            return new Result<>(ResultCode.SUCCESS, "Success", count);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(Exceptions.INVALID_ARGS);
         }

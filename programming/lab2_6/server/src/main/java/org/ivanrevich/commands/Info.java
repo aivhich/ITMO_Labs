@@ -1,11 +1,14 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.IOManager;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
 
 import java.util.Comparator;
+import java.util.Map;
 
 
 /**
@@ -27,24 +30,25 @@ public class Info implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
-        IOManager io = managersLocator.get(IOManager.class);
+    public org.ivanrevich.responses.Result<?> run(Request<?> request) {
+        //IOManager io = managersLocator.get(IOManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
 
-        io.write("Collection type: " + queueManager.getAll().getClass().getSimpleName());
-        io.write("Number of elements: " + queueManager.size());
-
+        //io.write("Collection type: " + queueManager.getAll().getClass().getSimpleName());
+        //io.write("Number of elements: " + queueManager.size());
+        String dateStr;
         try{
-            String dateStr = queueManager.getAll().stream()
+            dateStr = queueManager.getAll().stream()
                     .min(Comparator.comparing(Vehicle::getCreationDate))
                     .orElseThrow().getCreationDate()
                     .toString();
-            io.write("Date of first element: " + dateStr);
         } catch (Exception e){
-            io.write("Collection is empty, no creation date available.");
+            dateStr="Collection is empty, no creation date available.";
         }
 
-        return Result.SUCCESS;
+        return new Result<>(ResultCode.SUCCESS, "Success", Map.of("type", queueManager.getAll().getClass().getSimpleName(),
+                "numberOfElements", String.valueOf(queueManager.size()),
+                "initDate", dateStr));
     }
 
     @Override

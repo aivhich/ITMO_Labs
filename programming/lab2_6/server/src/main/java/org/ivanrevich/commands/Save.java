@@ -7,6 +7,9 @@ import org.ivanrevich.managers.StorageManager;
 
 import java.util.ArrayList;
 
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда сохранения коллекции в файл.
@@ -30,17 +33,17 @@ public class Save implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         StorageManager storageManager = managersLocator.get(StorageManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-
-        if(args.length==1) path=args[0];
+//        IOManager ioManager = managersLocator.get(IOManager.class);
+        //TODO WATCH DOCS
+        //if(args.length==1) path=args[0];
 
         storageManager.save(new ArrayList<>(queueManager.getAll()), path);
+//        ioManager.write("Saved "+path);
 
-        ioManager.write("Saved "+path);
-        return Result.SUCCESS;
+        return new Result(ResultCode.SUCCESS, "Success", path);
     }
 
     @Override

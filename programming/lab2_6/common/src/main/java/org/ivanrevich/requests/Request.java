@@ -3,11 +3,11 @@ package org.ivanrevich.requests;
 import java.io.Serializable;
 import java.util.List;
 
-public class Request implements Serializable {
-    private CommandType commandType;
-    private List<Object> args;
+public class Request<T> implements Serializable {
+    private final CommandType commandType;
+    private final T args;
 
-    public Request(CommandType commandType, List<Object> args) {
+    public Request(CommandType commandType, T args) {
         this.commandType = commandType;
         this.args = args;
     }
@@ -16,7 +16,7 @@ public class Request implements Serializable {
         return commandType;
     }
 
-    public List<Object> getArgs() {
+    public T getArgs() {
         return args;
     }
 }

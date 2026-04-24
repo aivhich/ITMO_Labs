@@ -7,6 +7,9 @@ import org.ivanrevich.models.Vehicle;
 
 import java.util.PriorityQueue;
 
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда вывода всех элементов коллекции.
@@ -28,18 +31,18 @@ public class Show implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         QueueManager queueManager =  managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
+//        IOManager ioManager = managersLocator.get(IOManager.class);
 
         PriorityQueue<Vehicle> vehicles = queueManager.getAll();
-        for(Vehicle v: vehicles) {
-            ioManager.write(v.toString());
-        }
-        if(vehicles.isEmpty()){
-            ioManager.write("Priority queue is empty");
-        }
-        return Result.SUCCESS;
+//        for(Vehicle v: vehicles) {
+//            ioManager.write(v.toString());
+//        }
+//        if(vehicles.isEmpty()){
+//            ioManager.write("Priority queue is empty");
+//        }
+        return new Result<>(ResultCode.SUCCESS, "Success", vehicles);
     }
 
     @Override

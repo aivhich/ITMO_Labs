@@ -5,13 +5,24 @@ import org.ivanrevich.utils.ResultCode;
 import java.io.Serializable;
 import java.util.List;
 
-public class Response implements Serializable {
+public class Response<T> implements Serializable {
     private ResultCode resultCode;
 
-    List<Serializable> objs;
+    private String message;
 
-    public Response(ResultCode resultCode, List<Serializable> objs) {
+    private T body;
+
+    public Response(ResultCode resultCode, String message,  T body) {
         this.resultCode = resultCode;
-        this.objs = objs;
+        this.message = message;
+        this.body = body;
+    }
+
+    public ResultCode getResultCode() {
+        return resultCode;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

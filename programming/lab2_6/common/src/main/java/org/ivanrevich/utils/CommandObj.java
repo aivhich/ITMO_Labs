@@ -1,5 +1,7 @@
 package org.ivanrevich.utils;
 
+import java.io.Serializable;
+
 /**
  * Объект команды с именем и аргументами.
  * <p>
@@ -11,4 +13,4 @@ package org.ivanrevich.utils;
  * @author Ivan Prokhorevich
  * @version 1.0
  */
-public record CommandObj(String name, String[] args) { }
+public record CommandObj(String name, String[] args) implements Serializable { }

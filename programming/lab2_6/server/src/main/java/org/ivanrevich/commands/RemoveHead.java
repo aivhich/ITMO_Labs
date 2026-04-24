@@ -3,6 +3,9 @@ package org.ivanrevich.commands;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда удаления и вывода первого элемента коллекции.
@@ -16,7 +19,7 @@ import org.ivanrevich.managers.QueueManager;
  * @see QueueManager
  */
 public class RemoveHead implements Command{
-    private ManagersLocator managersLocator;
+    private final ManagersLocator managersLocator;
 
     public RemoveHead(ManagersLocator managersLocator) {
         this.managersLocator = managersLocator;
@@ -28,10 +31,10 @@ public class RemoveHead implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> request) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-        ioManager.write(queueManager.remove_head().toString());
-        return Result.SUCCESS;
+        //IOManager ioManager = managersLocator.get(IOManager.class);
+        //ioManager.write(queueManager.remove_head().toString());
+        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head().toString());
     }
 }

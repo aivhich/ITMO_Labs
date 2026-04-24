@@ -1,24 +1,21 @@
 package org.ivanrevich.network;
 
-import org.ivanrevich.commands.Result;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.responses.Response;
+import org.ivanrevich.utils.Serializer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 public class ResponseHandler {
-    public static void apply(SelectionKey key, Result result){
+    public static void apply(SelectionKey key, Result<?> result) throws IOException {
         DatagramChannel dc = (DatagramChannel) key.channel();
 
-        new Response(result.getResultCode(), )
-        ByteBuffer writeBuf = data.getWriteBuffer();
-        writeBuf.clear();
-        String response = "ECHO: " + new String(readBuffer.array(), 0, readBuffer.limit());
-        writeBuf.put(response.getBytes());
-        writeBuf.flip();
+        ByteBuffer data = (new Serializer()).serialize(new Response<>(result.getResultCode(), result.getMessage(), result.getOutput()));
 
         // Отправка ответа сразу (UDP не требует OP_WRITE, можно писать напрямую)
-        dc.send(writeBuf, clientAddr);
+        dc.send(data, dc.getRemoteAddress());
     }
 }

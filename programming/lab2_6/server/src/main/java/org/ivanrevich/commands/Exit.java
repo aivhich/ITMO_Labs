@@ -1,7 +1,9 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.ManagersLocator;
-
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда завершения программы.
@@ -21,9 +23,10 @@ public class Exit implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> request) {
         System.exit(0);
-        return Result.SUCCESS;
+        //TODO
+        return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
     }
 
     @Override

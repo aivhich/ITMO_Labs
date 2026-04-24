@@ -1,12 +1,14 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
+import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.CommandObj;
-
+import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Result;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -34,28 +36,28 @@ public class History implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<List<CommandObj>> run(Request<?> r) {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
+        //IOManager ioManager = managersLocator.get(IOManager.class);
         ArrayList<CommandObj> fullHistory = commandManager.getHistory();
 
         int i = 13;
-        if(args.length>=1) {
-            try{
-                i = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                throw new RuntimeException(Exceptions.INVALID_ARGS);
-            }
-        }
-        if(args.length>=2) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
-
+//        if(args.length>=1) {
+//            try{
+//                i = Integer.parseInt(args[0]);
+//            } catch (NumberFormatException e) {
+//                throw new RuntimeException(Exceptions.INVALID_ARGS);
+//            }
+//        }
+//        if(args.length>=2) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+//
         int startIdx = fullHistory.size()-(i);
         if(startIdx<0) startIdx=0;
 
-        for (CommandObj commandObj : fullHistory.subList(startIdx, fullHistory.size())) {
-            ioManager.write(commandObj.name());
-        }
+//        for (CommandObj commandObj : fullHistory.subList(startIdx, fullHistory.size())) {
+//            ioManager.write(commandObj.name());
+//        }
 
-        return Result.SUCCESS;
+        return new Result<>(ResultCode.SUCCESS, "Success", fullHistory.subList(startIdx, fullHistory.size()));
     }
 }

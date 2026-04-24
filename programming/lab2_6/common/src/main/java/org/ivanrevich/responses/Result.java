@@ -1,12 +1,17 @@
-package org.ivanrevich.commands;
+package org.ivanrevich.responses;
 
-public class Result {
+import org.ivanrevich.utils.ResultCode;
+
+
+public class Result<T> {
     private org.ivanrevich.utils.ResultCode resultCode;
     private String message;
+    private T output;
 
-    public Result(org.ivanrevich.utils.ResultCode resultCode, String message) {
+    public Result(ResultCode resultCode, String message, T output) {
         this.resultCode = resultCode;
         this.message = message;
+        this.output = output;
     }
 
     public org.ivanrevich.utils.ResultCode getResultCode() {
@@ -17,4 +22,7 @@ public class Result {
         return message;
     }
 
+    public T getOutput() {
+        return output;
+    }
 }

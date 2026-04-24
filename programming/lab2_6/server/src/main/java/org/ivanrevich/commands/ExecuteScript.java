@@ -5,6 +5,9 @@ import org.ivanrevich.managers.FileIOManagerImpl;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.IOManagerStack;
 import org.ivanrevich.managers.ManagersLocator;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда выполнения скрипта из файла.
@@ -27,17 +30,17 @@ public class ExecuteScript implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         IOManagerStack stack = locator.get(IOManagerStack.class);
 
-        if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
-        //TODO PATH CHECKING
+        //if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        //TODO
 
-        IOManager fileIO = new FileIOManagerImpl(args[0]);
-        stack.push(fileIO);
-        locator.register(IOManager.class, fileIO);
+        //IOManager fileIO = new FileIOManagerImpl(args[0]);
+        //stack.push(fileIO);
+        //locator.register(IOManager.class, fileIO);
 
-        return Result.SUCCESS;
+        return new Result(ResultCode.SUCCESS, "Success", "");
     }
 
     @Override

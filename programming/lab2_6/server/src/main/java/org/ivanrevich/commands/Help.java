@@ -1,9 +1,10 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.CommandManager;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
-
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Result;
 
 /**
  * Команда вывода справки по доступным командам.
@@ -25,15 +26,16 @@ public class Help implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
-        IOManager ioManager = managersLocator.get(IOManager.class);
+    public Result<String> run(Request<?> r) {
+        //IOManager ioManager = managersLocator.get(IOManager.class);
         CommandManager commandManager = managersLocator.get(CommandManager.class);
 
-        ioManager.write("--- HELP ---");
+        //ioManager.write("--- HELP ---");
+        StringBuilder out = new StringBuilder("\"--- HELP ---\"");
         for(Command c: commandManager.getRegistedCommands()){
-            ioManager.write(c.toString());
+            out.append(c.toString());
         }
-        return Result.SUCCESS;
+        return new Result<>(ResultCode.SUCCESS, "Success", out.toString());
     }
 
     @Override

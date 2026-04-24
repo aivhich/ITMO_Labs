@@ -3,6 +3,9 @@ package org.ivanrevich.commands;
 import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Result;
 
 /**
  * Команда удаления элемента по идентификатору.
@@ -23,15 +26,17 @@ public class RemoveById implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+
         try {
-            queueManager.remove_by_id(Integer.parseInt(args[0]));
+            int id = Integer.parseInt(String.valueOf(r.getArgs()));
+            queueManager.remove_by_id(id);
+
+            return new Result<>(ResultCode.SUCCESS, "Success", id);
         } catch (NumberFormatException e) {
             throw new RuntimeException(Exceptions.INVALID_ARGS);
         }
-        return Result.SUCCESS;
     }
 
     @Override

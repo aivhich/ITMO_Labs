@@ -6,7 +6,9 @@ import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
-
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 /**
  * Команда обновления элемента по идентификатору.
@@ -28,26 +30,23 @@ public class Update implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+    public Result<?> run(Request<?> r) {
+//        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
 
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
+        //IOManager ioManager = managersLocator.get(IOManager.class);
 
         try {
-            int id = Integer.parseInt(args[0]);
-
-            if(!queueManager.isExistWithId(id)) {
+            Vehicle newv = (Vehicle) r.getArgs();
+            if(!queueManager.isExistWithId(newv.getId())) {
                 throw new RuntimeException(Exceptions.ID_ISN_EXIST);
             }
+            //ioManager.write(String.format("--- Updating element with id=%s ---", args[0]));
+            //ioManager.write(old.toString());
+            queueManager.updateById(newv.getId(),  newv);
 
-            Vehicle old = queueManager.getById(id);
-            ioManager.write(String.format("--- Updating element with id=%s ---", args[0]));
-            ioManager.write(old.toString());
-            queueManager.updateById(id,  (new VehicleFactory(ioManager)).updateVehicle(old));
-
-            ioManager.write("Successfully updated vehicle name: " + old.getId());
-            return Result.SUCCESS;
+            //ioManager.write("Successfully updated vehicle name: " + old.getId());
+            return new Result<>(ResultCode.SUCCESS, "Success", "Successfully updated vehicle "+newv.getId());
         } catch (NumberFormatException e) {
             throw new RuntimeException(Exceptions.INVALID_ARGS);
         }

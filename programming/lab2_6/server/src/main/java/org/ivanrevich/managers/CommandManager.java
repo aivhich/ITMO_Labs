@@ -1,7 +1,7 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
-import org.ivanrevich.commands.Result;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.CommandObj;

@@ -5,6 +5,9 @@ import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
+import org.ivanrevich.utils.ResultCode;
 
 import java.util.Iterator;
 
@@ -29,19 +32,20 @@ public class RemoveLower implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
-        IOManager io = managersLocator.get(IOManager.class);
+    public Result<?> run(Request<?> r) {
+        //IOManager io = managersLocator.get(IOManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
 
-        io.write("Enter the reference vehicle to remove all lower elements:");
-        VehicleFactory factory = new VehicleFactory(io);
+        //io.write("Enter the reference vehicle to remove all lower elements:");
+        //VehicleFactory factory = new VehicleFactory(io);
         Vehicle reference;
 
         try {
-            reference = factory.createVehicleForRef();
+            //reference = factory.createVehicleForRef();
+            reference = (Vehicle) r.getArgs();
         } catch (IllegalArgumentException e) {
-            io.write("Invalid input, operation aborted.");
-            return Result.FAIL;
+            //io.write("Invalid input, operation aborted.");
+            return new Result<>(ResultCode.FAIL_0, "Fail TODO", "Invalid input, operation aborted.");
         }
 
         Iterator<Vehicle> iterator = queueManager.getAll().iterator();
@@ -54,8 +58,8 @@ public class RemoveLower implements Command{
             }
         }
 
-        io.write("Removed " + removedCount + " vehicles that were lower than the reference.");
-        return Result.SUCCESS;
+        //io.write("Removed " + removedCount + " vehicles that were lower than the reference.");
+        return new Result(ResultCode.SUCCESS, "Success", removedCount);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
-import org.ivanrevich.commands.Result;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.requests.Request;
@@ -45,8 +45,8 @@ public class CommandManagerImpl implements CommandManager{
     }
 
     @Override
-    public Result run(Request r) {
-        Result resultCode = availableCommands.get(r.getCommandType().getName()).run(r.getArgs().toArray(new Object[0]));
+    public Result<?> run(Request r) {
+        Result resultCode = availableCommands.get(r.getCommandType().getName()).run(r);
         history.add(new CommandObj(r.getCommandType().getName(), new String[]{}));
         return resultCode;
     }

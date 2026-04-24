@@ -1,6 +1,8 @@
 package org.ivanrevich.commands;
 
 
+import org.ivanrevich.requests.Request;
+
 /**
  * Интерфейс команды в паттерне Command.
  * <p>
@@ -10,16 +12,21 @@ package org.ivanrevich.commands;
  *
  * @author Ivan Prokhorevich
  * @version 1.0
- * @see Result
+ * @see org.ivanrevich.responses.Result
  */
-public interface Command {
+public interface Command{
     /**
      * Выполняет команду с переданными аргументами.
      *
      * @param args массив аргументов командной строки
-     * @return {@link Result#SUCCESS} если команда выполнена успешно,
-     *         {@link Result#FAIL} если произошла ошибка
+     * @return {@link ResultCode#SUCCESS} если команда выполнена успешно,
+     *         {@link ResultCode#FAIL} если произошла ошибка
      */
-    Result run(Object[] args);
+
+    org.ivanrevich.responses.Result<?> run(Request<?> r);
+
+//
+//    @Deprecated
+//    Result<?> run(String[] args);
 }
 

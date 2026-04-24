@@ -2,7 +2,9 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
-
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.responses.Result;
 /**
  * Команда очистки коллекции.
  * <p>
@@ -18,10 +20,10 @@ public class Clear implements Command{
     private final ManagersLocator managersLocator;
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
         queueManager.clear();
-        return Result.SUCCESS;
+        return new Result<>(ResultCode.SUCCESS, "Success", "Successfully clear collection");
     }
 
     @Override

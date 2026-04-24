@@ -1,14 +1,15 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.ResultCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import org.ivanrevich.responses.Result;
 /**
  * Команда вывода элементов коллекции в порядке возрастания.
  * <p>
@@ -30,13 +31,13 @@ public class PrintAscending implements Command{
     }
 
     @Override
-    public Result run(String[] args) {
+    public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
+//        IOManager ioManager = managersLocator.get(IOManager.class);
         List<Vehicle> vehicleList = new ArrayList<>(queueManager.getAll());
         Collections.sort(vehicleList);
-        vehicleList.forEach(vehicle -> ioManager.write(vehicle.toString()));
-        return Result.SUCCESS;
+//        vehicleList.forEach(vehicle -> ioManager.write(vehicle.toString()));
+        return new Result<>(ResultCode.SUCCESS, "Success", vehicleList);
     }
 
     @Override

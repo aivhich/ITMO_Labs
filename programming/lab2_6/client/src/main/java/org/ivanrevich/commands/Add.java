@@ -8,7 +8,6 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
@@ -55,22 +54,16 @@ public class Add implements Command {
      */
     @Override
     public ResultCode run(String[] args) {
-        //QueueManager queueManager = managersLocator.get(QueueManager.class);
-        //IOManager ioManager = managersLocator.get(IOManager.class);
-        //Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
-        //Vehicle vehicle = (Vehicle) r.getArgs();
-        //queueManager.add(vehicle);
-        //ioManager.write("Successfully created vehicle"); @DEPRECATED
         IOManager ioManager = managersLocator.get(IOManager.class);
         Client client = managersLocator.get(Client.class);
         Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
         try {
-            Response r = client.sendObject(new Request<Vehicle>(CommandType.ADD, vehicle));
+            Response<?> r = client.sendObject(new Request<Vehicle>(CommandType.ADD, vehicle));
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 }

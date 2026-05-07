@@ -36,14 +36,14 @@ public class Update implements Command{
 
     @Override
     public ResultCode run(String[] args) {
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        if(args.length!=1) return ResultCode.INVALID_NUM_OF_ARGS;
         Client client = managersLocator.get(Client.class);
         CommandManager commandManager = managersLocator.get(CommandManager.class);
         IOManager ioManager = managersLocator.get(IOManager.class);
 
         try {
             int id = Integer.parseInt(args[0]);
-            List<Vehicle> vehicles = (List<Vehicle>) client.sendObject(new Request<>(CommandType.SHOW, null));
+            List<Vehicle> vehicles = (List<Vehicle>) client.sendObject(new Request<>(CommandType.SHOW, null)).getBody();
             Vehicle old = vehicles.stream().filter(vehicle -> vehicle.getId()==id).findFirst().get();
 
 
@@ -56,11 +56,11 @@ public class Update implements Command{
             ioManager.write("Successfully updated vehicle name: " + newveh.getId());
             return r.getResultCode();
         } catch (NumberFormatException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return ResultCode.INVALID_ARGS;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         }
     }
 

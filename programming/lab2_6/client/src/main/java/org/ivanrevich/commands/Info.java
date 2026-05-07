@@ -42,9 +42,9 @@ public class Info implements Command{
             io.write("Init date: " + map.get("init_date"));
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

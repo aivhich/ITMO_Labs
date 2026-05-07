@@ -7,12 +7,9 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 /**
  * Команда вывода элементов коллекции в порядке возрастания.
@@ -47,9 +44,9 @@ public class PrintAscending implements Command{
             }
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

@@ -38,11 +38,9 @@ public class RemoveLower implements Command{
         Vehicle reference;
 
         try {
-            //reference = factory.createVehicleForRef();
             reference = (Vehicle) r.getArgs();
         } catch (IllegalArgumentException e) {
-            //io.write("Invalid input, operation aborted.");
-            return new Result<>(ResultCode.FAIL_0, "Fail TODO", "Invalid input, operation aborted.");
+            return new Result<>(ResultCode.INVALID_INPUT, "Fail", "Invalid input, operation aborted.");
         }
 
         Iterator<Vehicle> iterator = queueManager.getAll().iterator();

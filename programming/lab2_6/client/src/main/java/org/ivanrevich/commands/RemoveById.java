@@ -6,7 +6,6 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
@@ -30,18 +29,18 @@ public class RemoveById implements Command{
 
     @Override
     public ResultCode run(String[]  args) {
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        if(args.length!=1)return ResultCode.INVALID_NUM_OF_ARGS;
         Client client = managersLocator.get(Client.class);
         try {
             int id = Integer.parseInt(String.valueOf(args[0]));
             Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_BY_ID, null));
             return r.getResultCode();
         } catch (NumberFormatException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return ResultCode.INVALID_ARGS;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

@@ -25,7 +25,6 @@ public class Exit implements Command{
     @Override
     public ResultCode run(String [] args) {
         System.exit(0);
-        //TODO
         return ResultCode.SUCCESS;
     }
 

@@ -35,7 +35,7 @@ public class RemoveById implements Command{
 
             return new Result<>(ResultCode.SUCCESS, "Success", id);
         } catch (NumberFormatException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
         }
     }
 

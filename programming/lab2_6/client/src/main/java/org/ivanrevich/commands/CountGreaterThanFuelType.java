@@ -9,12 +9,10 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.PriorityQueue;
 
 
 /**
@@ -35,7 +33,7 @@ public class CountGreaterThanFuelType implements Command{
 
     @Override
     public ResultCode run(String[] args) {
-        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        if(args.length!=1) return ResultCode.INVALID_NUM_OF_ARGS;
 
         try {
             FuelType fuelType = FuelType.valueOf(args[0]);
@@ -52,11 +50,11 @@ public class CountGreaterThanFuelType implements Command{
             ioManager.write(String.format("There %s fuel type greater that it", count));
             return ResultCode.SUCCESS;
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return ResultCode.INVALID_ARGS;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

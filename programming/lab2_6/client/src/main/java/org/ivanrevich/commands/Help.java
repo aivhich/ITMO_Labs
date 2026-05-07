@@ -40,9 +40,9 @@ public class Help implements Command{
             ioManager.write((String) r.getBody());
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

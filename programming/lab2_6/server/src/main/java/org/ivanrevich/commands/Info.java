@@ -31,11 +31,7 @@ public class Info implements Command{
 
     @Override
     public org.ivanrevich.responses.Result<?> run(Request<?> request) {
-        //IOManager io = managersLocator.get(IOManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-
-        //io.write("Collection type: " + queueManager.getAll().getClass().getSimpleName());
-        //io.write("Number of elements: " + queueManager.size());
         String dateStr;
         try{
             dateStr = queueManager.getAll().stream()
@@ -43,12 +39,16 @@ public class Info implements Command{
                     .orElseThrow().getCreationDate()
                     .toString();
         } catch (Exception e){
-            dateStr="Collection is empty, no creation date available.";
+            dateStr = "Collection is empty, no creation date available.";
         }
 
-        return new Result<>(ResultCode.SUCCESS, "Success", Map.of("type", queueManager.getAll().getClass().getSimpleName(),
-                "numberOfElements", String.valueOf(queueManager.size()),
-                "initDate", dateStr));
+        return new Result<>(ResultCode.SUCCESS, "Success",
+                Map.of(
+                        "type", queueManager.getAll().getClass().getSimpleName(),
+                        "count", String.valueOf(queueManager.size()),
+                        "init_date", dateStr
+                )
+        );
     }
 
     @Override

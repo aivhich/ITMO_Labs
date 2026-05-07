@@ -7,9 +7,7 @@ import java.util.List;
 
 public class Response<T> implements Serializable {
     private ResultCode resultCode;
-
     private String message;
-
     private T body;
 
     public Response(ResultCode resultCode, String message,  T body) {

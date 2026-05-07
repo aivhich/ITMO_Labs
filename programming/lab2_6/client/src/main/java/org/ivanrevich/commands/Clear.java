@@ -24,17 +24,15 @@ public class Clear implements Command{
 
     @Override
     public ResultCode run(String[] args) {
-        //QueueManager queueManager = managersLocator.get(QueueManager.class);
-        //queueManager.clear();
-
         Client client = managersLocator.get(Client.class);
         try {
-            Response r = client.sendObject(new Request<>(CommandType.CLEAR, null));
+            Response<?> r = client.sendObject(new Request<>(CommandType.CLEAR, null));
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
+        } catch (ClassNotFoundException e)
+        {
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

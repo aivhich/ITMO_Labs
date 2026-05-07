@@ -8,11 +8,9 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * Команда удаления элементов, меньших заданного.
@@ -43,13 +41,17 @@ public class RemoveLower implements Command{
 
         try {
             reference = factory.createVehicleForRef();
-            Response r = client.sendObject(new Request<>(CommandType.REMOVE_LOWER, reference));
+            Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_LOWER, reference));
             int removedCount = (int) r.getBody();
             io.write("Removed " + removedCount + " vehicles that were lower than the reference.");
             return r.getResultCode();
-        } catch (IllegalArgumentException | IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             io.write("Invalid input, operation aborted.");
-            return ResultCode.FAIL_0;
+            return ResultCode.INVALID_REQUEST;
+        } catch (IOException e){
+            return ResultCode.INTERNAL_CLI_ERROR;
+        } catch (IllegalArgumentException e){
+            return ResultCode.INVALID_ARGS;
         }
     }
 

@@ -7,6 +7,7 @@ import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
+import org.ivanrevich.validators.VehicleValidate;
 
 /**
  * Команда обновления элемента по идентификатору.
@@ -28,24 +29,22 @@ public class Update implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
-//        if(args.length!=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
 
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        //IOManager ioManager = managersLocator.get(IOManager.class);
-
         try {
             Vehicle newv = (Vehicle) r.getArgs();
+            if (!(new VehicleValidate()).apply(newv))
+                return new Result<Vehicle>(ResultCode.INVALID_INPUT, "Exception while update vehicle. Invalid input", newv);
+
             if(!queueManager.isExistWithId(newv.getId())) {
-                throw new RuntimeException(Exceptions.ID_ISN_EXIST);
+                return new Result<>(ResultCode.ID_ISN_EXIST, "Fail", "Entity with that id is not exists.");
             }
-            //ioManager.write(String.format("--- Updating element with id=%s ---", args[0]));
-            //ioManager.write(old.toString());
             queueManager.updateById(newv.getId(),  newv);
 
             //ioManager.write("Successfully updated vehicle name: " + old.getId());
             return new Result<>(ResultCode.SUCCESS, "Success", "Successfully updated vehicle "+newv.getId());
         } catch (NumberFormatException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
         }
     }
 

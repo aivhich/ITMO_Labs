@@ -6,6 +6,7 @@ import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.responses.Result;
+import org.ivanrevich.validators.VehicleValidate;
 
 /**
  * Команда добавления нового транспортного средства в коллекцию.
@@ -50,9 +51,9 @@ public class Add implements Command {
     @Override
     public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        //IOManager ioManager = managersLocator.get(IOManager.class);
-        //Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
         Vehicle vehicle = (Vehicle) r.getArgs();
+        if (!(new VehicleValidate()).apply(vehicle))
+            return new Result<Vehicle>(ResultCode.INVALID_INPUT, "Exception while created vehicle. Invalid input", vehicle);
         queueManager.add(vehicle);
         ///ioManager.write("Successfully created vehicle"); @DEPRECATED
         return new Result<Vehicle>(ResultCode.SUCCESS, "Successfully created vehicle", vehicle);

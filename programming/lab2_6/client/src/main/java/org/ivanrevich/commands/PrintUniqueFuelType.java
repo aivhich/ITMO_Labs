@@ -12,7 +12,7 @@ import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 /**
  * Команда вывода уникальных значений типа топлива.
  * <p>
@@ -49,9 +49,9 @@ public class PrintUniqueFuelType implements Command{
             }
             return r.getResultCode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
     }
 

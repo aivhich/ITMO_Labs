@@ -5,13 +5,11 @@ import org.ivanrevich.manager.IOManager;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
-import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.CommandObj;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -45,12 +43,12 @@ public class History implements Command{
         try {
             fullHistory = (ArrayList<CommandObj>) client.sendObject(new Request<>(CommandType.HISTORY, null)).getBody();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INTERNAL_CLI_ERROR;
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            return ResultCode.INVALID_REQUEST;
         }
         for (CommandObj commandObj : fullHistory) {
-            ioManager.write(commandObj.toString());
+            ioManager.write(commandObj.name());
         }
         return ResultCode.SUCCESS;
     }

@@ -1,5 +1,7 @@
 package org.ivanrevich.network;
 
+import org.ivanrevich.utils.FragmentInfo;
+import org.ivanrevich.utils.Fragment;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.responses.Response;
 import org.ivanrevich.utils.Serializer;
@@ -21,8 +23,14 @@ public class ResponseHandler {
                 result.getOutput()
         );
         ByteBuffer data = serializer.serialize(response);
+        Fragment fragment = new Fragment(data, 1024);
+        FragmentInfo fragmentInfo = new FragmentInfo(fragment.getDataSize(), fragment.getChunksCount(), 1024);
 
-        // UDP: отправляем датаграмму обратно клиенту
-        dc.send(data, clientAddress);
+        dc.send(serializer.serialize(fragmentInfo), clientAddress);
+        while(true){
+            ByteBuffer buffer = fragment.send();
+            if(buffer == null) break;
+            dc.send(buffer, clientAddress);
+        }
     }
 }

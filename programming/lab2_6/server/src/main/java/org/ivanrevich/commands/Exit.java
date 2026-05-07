@@ -25,7 +25,6 @@ public class Exit implements Command{
     @Override
     public Result<?> run(Request<?> request) {
         System.exit(0);
-        //TODO
         return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
     }
 

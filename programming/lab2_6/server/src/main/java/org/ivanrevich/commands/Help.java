@@ -27,13 +27,11 @@ public class Help implements Command{
 
     @Override
     public Result<String> run(Request<?> r) {
-        //IOManager ioManager = managersLocator.get(IOManager.class);
         CommandManager commandManager = managersLocator.get(CommandManager.class);
 
-        //ioManager.write("--- HELP ---");
-        StringBuilder out = new StringBuilder("\"--- HELP ---\"");
+        StringBuilder out = new StringBuilder("--- HELP ---\n");
         for(Command c: commandManager.getRegistedCommands()){
-            out.append(c.toString());
+            out.append(c.toString()+"\n");
         }
         return new Result<>(ResultCode.SUCCESS, "Success", out.toString());
     }

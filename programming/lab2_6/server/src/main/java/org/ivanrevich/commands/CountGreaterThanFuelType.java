@@ -46,7 +46,7 @@ public class CountGreaterThanFuelType implements Command{
 //            ioManager.write(String.format("There %s fuel type greater that it", count));
             return new Result<>(ResultCode.SUCCESS, "Success", count);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(Exceptions.INVALID_ARGS);
+            return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
         }
     }
 

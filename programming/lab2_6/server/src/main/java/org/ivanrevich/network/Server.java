@@ -10,9 +10,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server {
     private final DatagramChannel channel;
@@ -28,14 +27,20 @@ public class Server {
         channel.configureBlocking(false);
         this.managersLocator = managersLocator;
         channel.register(selector, SelectionKey.OP_READ);
+
+        logger.log(Level.INFO, "Сетевой канал открыт, порт: " + port);
     }
 
     public void run() throws Exception {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
         running = true;
+
+        logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
+
         while (running) {
             selector.select();
             Set<SelectionKey> keys = selector.selectedKeys();
+
             for (var iter = keys.iterator(); iter.hasNext(); ) {
                 SelectionKey key = iter.next();
                 iter.remove();
@@ -43,27 +48,50 @@ public class Server {
                 if (!key.isValid()) continue;
 
                 if (key.isReadable()) {
-                    InetSocketAddress sender;
-                    
+                    InetSocketAddress sender = null;
+
                     ReadResult readResult = RequestHandler.apply(key);
-                    if (readResult == null) continue;
+                    if (readResult == null) {
+                        logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
+                        continue;
+                    }
 
                     Request<?> request = readResult.request();
                     sender = readResult.senderAddress();
 
-                    try{
+                    logger.log(Level.INFO, "Получен запрос от " + sender
+                            + " | команда: " + request.getCommandType());
+
+                    try {
                         Result<?> result = commandManager.run(request);
+
+                        logger.log(Level.INFO, "Команда " + request.getCommandType()
+                                + " выполнена | статус: " + result.getResultCode()
+                                + " | клиент: " + sender);
+
                         ResponseHandler.apply(key, result, sender);
-                    }catch (Exception e){
-                        logger.log(Level.WARNING, e.getMessage());
-                        if(sender!=null)
-                            ResponseHandler.apply(key,
-                                    new Result<>(
-                                            ResultCode.INTERNAL_SERVER_ERROR,
-                                            e.getMessage(),
-                                            e.getCause()),
-                                    sender
-                            );
+
+                        logger.log(Level.INFO, "Ответ отправлен клиенту " + sender);
+
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "Ошибка при обработке команды "
+                                + request.getCommandType() + ": " + e.getMessage(), e);
+
+                        if (sender != null) {
+                            try {
+                                ResponseHandler.apply(key,
+                                        new Result<>(
+                                                ResultCode.INTERNAL_SERVER_ERROR,
+                                                e.getMessage(),
+                                                e.getCause()),
+                                        sender
+                                );
+                                logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + sender);
+                            } catch (IOException sendEx) {
+                                logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту "
+                                        + sender + ": " + sendEx.getMessage());
+                            }
+                        }
                     }
                 }
             }
@@ -72,7 +100,9 @@ public class Server {
 
     public void stop() throws IOException {
         running = false;
+        logger.log(Level.INFO, "Остановка сервера...");
         if (selector != null) selector.close();
         if (channel != null) channel.close();
+        logger.log(Level.INFO, "Сервер остановлен");
     }
 }

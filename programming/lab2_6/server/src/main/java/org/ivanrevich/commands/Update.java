@@ -1,6 +1,5 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;

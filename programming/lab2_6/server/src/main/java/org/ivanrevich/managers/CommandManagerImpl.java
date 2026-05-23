@@ -1,39 +1,52 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
-import org.ivanrevich.responses.Result;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.CommandObj;
+import org.ivanrevich.utils.ResultCode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Реализация менеджера команд.
+ * Реализация менеджера команд сервера.
  * <p>
- * Хранит зарегистрированные команды, историю выполнения
- * и управляет их исполнением.
+ * Принимает {@link Request} от клиента, извлекает {@link org.ivanrevich.requests.CommandType},
+ * находит соответствующую команду, выполняет её и возвращает {@link Result}.
+ * Также ведёт историю выполненных команд.
  * </p>
  *
  * @author Ivan Prokhorevich
- * @version 1.0
+ * @version 2.0
  * @see CommandManager
- * @see org.ivanrevich.ManagersLocator
  */
-public class CommandManagerImpl implements CommandManager{
-    private final HashMap<String, Command> availableCommands = new HashMap<String, Command>(); //TODO
-    private final ArrayList<CommandObj> history = new ArrayList<>(); // Is it normal?
+public class CommandManagerImpl implements CommandManager {
+    private final HashMap<String, Command> availableCommands = new HashMap<>();
+    private final ArrayList<CommandObj> history = new ArrayList<>();
 
     @Override
     public ArrayList<CommandObj> getHistory() {
         return history;
     }
 
-
     @Override
     public Result<?> run(Request<?> r) {
-        Result<?> resultCode = availableCommands.get(r.getCommandType().getName()).run(r);
-        history.add(new CommandObj(r.getCommandType().getName(), new String[]{}));
-        return resultCode;
+        String commandName = r.getCommandType().getName();
+
+        Command command = availableCommands.get(commandName);
+        if (command == null) {
+            throw new AppException(ResultCode.COMMAND_NOT_FOUND, commandName);
+        }
+
+        Result<?> result = command.run(r);
+
+        history.add(new CommandObj(commandName, new String[]{}));
+
+        return result;
     }
 
     @Override

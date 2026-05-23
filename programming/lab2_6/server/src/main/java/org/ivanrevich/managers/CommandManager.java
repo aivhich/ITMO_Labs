@@ -1,64 +1,68 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
-import org.ivanrevich.responses.Result;
-import org.ivanrevich.exceptions.Exceptions;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.requests.Request;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.CommandObj;
+import org.ivanrevich.utils.ResultCode;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-
 /**
- * Интерфейс менеджера команд.
+ * Интерфейс менеджера команд сервера.
  * <p>
- * Управляет регистрацией, парсингом и выполнением команд в приложении.
- * Реализует паттерн Command Dispatcher.
+ * Принимает десериализованный {@link Request} от клиента,
+ * находит нужную команду по {@link org.ivanrevich.requests.CommandType}
+ * и возвращает {@link Result} для отправки обратно клиенту.
  * </p>
  *
  * @author Ivan Prokhorevich
- * @version 1.0
+ * @version 2.0
  * @see Command
  * @see CommandObj
  * @see CommandManagerImpl
  */
 public interface CommandManager {
-    /**
-     * Парсит строку команды в объект CommandObj.
-     *
-     * @param cmd строка команды от пользователя
-     * @return объект {@link CommandObj} с именем и аргументами
-     * @throws RuntimeException если команда не может быть распарсена
-     */
-    static CommandObj parseCommand(String cmd){
-        String[] tokens = cmd.trim().strip().split(" ");
-        if(tokens.length>0){
-            String command = tokens[0].toLowerCase();
-            String args[] = new String[tokens.length-1];
 
-            if(tokens.length>1){
+    /**
+     * Парсит строку команды в объект {@link CommandObj}.
+     * <p>
+     * Используется только внутри сервера (например, для консольного управления).
+     * Клиентские команды приходят уже в виде {@link Request}.
+     * </p>
+     *
+     * @param cmd строка команды
+     * @return объект с именем и аргументами
+     * @throws AppException с кодом {@link ResultCode#COMMAND_PARSE_ERROR} если строка пустая
+     */
+    static CommandObj parseCommand(String cmd) {
+        String[] tokens = cmd.trim().strip().split(" ");
+        if (tokens.length > 0) {
+            String command = tokens[0].toLowerCase();
+            String[] args = new String[tokens.length - 1];
+            if (tokens.length > 1) {
                 System.arraycopy(tokens, 1, args, 0, tokens.length - 1);
             }
             return new CommandObj(command, args);
         }
-        throw new RuntimeException(Exceptions.COMMAND_PARSE_ERROR);
-    };
+        throw new AppException(ResultCode.COMMAND_PARSE_ERROR);
+    }
 
     /**
      * Возвращает историю выполненных команд.
      *
-     * @return список объектов CommandObj
+     * @return список объектов {@link CommandObj}
      */
     ArrayList<CommandObj> getHistory();
 
-
-//    void run(String cmd);
     /**
-     * Выполняет команду по строке.
+     * Выполняет команду из входящего запроса клиента.
      *
-     * @param r запрос для выполнения команды
+     * @param r десериализованный запрос от клиента
+     * @return результат выполнения команды для отправки клиенту
      */
     Result<?> run(Request<?> r);
 
@@ -72,7 +76,7 @@ public interface CommandManager {
     /**
      * Регистрирует набор команд.
      *
-     * @param commands карта имя-команда для регистрации
+     * @param commands карта имя → команда
      */
     void registerCommands(Map<String, Command> commands);
 }

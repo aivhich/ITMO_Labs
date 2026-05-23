@@ -4,14 +4,25 @@ import org.ivanrevich.commands.*;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Server;
 import org.ivanrevich.requests.CommandType;
+import org.ivanrevich.requests.Request;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainServer {
-    public static void main(String[] args) throws Exception {
-        int port = Integer.parseInt(args[0]);
+    private static final Logger logger = Logger.getLogger(MainServer.class.getName());
 
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Использование: MainServer <port> <path-to-csv>");
+            System.exit(1);
+        }
+
+        int port = Integer.parseInt(args[0]);
         String path = args[1];
+
+        logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
 
         QueueManager queueManager = new QueueManagerImpl();
         StorageManager storageManager = new StorageManagerImpl(path, queueManager);
@@ -19,7 +30,6 @@ public class MainServer {
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(StorageManager.class, storageManager);
         managersLocator.register(QueueManager.class, queueManager);
-
 
         CommandManager commandManager = new CommandManagerImpl();
         managersLocator.register(CommandManager.class, commandManager);
@@ -45,7 +55,18 @@ public class MainServer {
                 )
         );
 
+        // Сохраняем коллекцию при завершении работы сервера (Ctrl+C, kill и т.д.)
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию в " + path);
+            try {
+                commandManager.run(new Request<>(CommandType.SAVE, null));
+                logger.log(Level.INFO, "Коллекция успешно сохранена");
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Ошибка при сохранении коллекции: " + e.getMessage());
+            }
+        }));
 
+        logger.log(Level.INFO, "Сервер успешно инициализирован, ожидаю подключений...");
 
         Server server = new Server(port, managersLocator);
         server.run();

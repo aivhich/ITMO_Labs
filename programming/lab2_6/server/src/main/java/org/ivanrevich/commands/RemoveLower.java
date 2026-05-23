@@ -7,13 +7,11 @@ import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
-import java.util.Iterator;
-
 /**
  * Команда удаления элементов, меньших заданного.
  * <p>
- * Запрашивает эталонное транспортное средство и удаляет все элементы,
- * которые меньше его согласно {@link Vehicle#compareTo(Vehicle)}.
+ * Удаляет все элементы коллекции, которые меньше эталонного
+ * согласно {@link Vehicle#compareTo(Vehicle)}.
  * </p>
  *
  * @author Ivan Revich
@@ -21,8 +19,8 @@ import java.util.Iterator;
  * @see Command
  * @see Vehicle
  */
-public class RemoveLower implements Command{
-    private final  ManagersLocator managersLocator;
+public class RemoveLower implements Command {
+    private final ManagersLocator managersLocator;
 
     public RemoveLower(ManagersLocator managersLocator) {
         this.managersLocator = managersLocator;
@@ -30,31 +28,27 @@ public class RemoveLower implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
-        //IOManager io = managersLocator.get(IOManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
 
-        //io.write("Enter the reference vehicle to remove all lower elements:");
-        //VehicleFactory factory = new VehicleFactory(io);
         Vehicle reference;
-
         try {
             reference = (Vehicle) r.getArgs();
-        } catch (IllegalArgumentException e) {
-            return new Result<>(ResultCode.INVALID_INPUT, "Fail", "Invalid input, operation aborted.");
+        } catch (ClassCastException e) {
+            return new Result<>(ResultCode.INVALID_INPUT, "Fail", "Некорректный аргумент команды.");
         }
 
-        Iterator<Vehicle> iterator = queueManager.getAll().iterator();
-        int removedCount = 0;
-        while (iterator.hasNext()) {
-            Vehicle v = iterator.next();
-            if (v.compareTo(reference) < 0) {
-                iterator.remove();
-                removedCount++;
-            }
+        if (reference == null) {
+            return new Result<>(ResultCode.INVALID_INPUT, "Fail", "Эталонный объект не передан.");
         }
 
-        //io.write("Removed " + removedCount + " vehicles that were lower than the reference.");
-        return new Result(ResultCode.SUCCESS, "Success", removedCount);
+        // Используем removeIf со Stream API вместо ручного итератора
+        long removedCount = queueManager.getAll().stream()
+                .filter(v -> v.compareTo(reference) < 0)
+                .count();
+
+        queueManager.getAll().removeIf(v -> v.compareTo(reference) < 0);
+
+        return new Result<>(ResultCode.SUCCESS, "Success", (int) removedCount);
     }
 
     @Override

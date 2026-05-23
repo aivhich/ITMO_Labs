@@ -1,7 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.exceptions.Exceptions;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
@@ -20,7 +19,7 @@ import java.io.IOException;
  * @version 1.0
  * @see Command
  */
-public class RemoveById implements Command{
+public class RemoveById implements Command {
     private final ManagersLocator managersLocator;
 
     public RemoveById(ManagersLocator managersLocator) {
@@ -28,12 +27,13 @@ public class RemoveById implements Command{
     }
 
     @Override
-    public ResultCode run(String[]  args) {
-        if(args.length!=1)return ResultCode.INVALID_NUM_OF_ARGS;
+    public ResultCode run(String[] args) {
+        if (args.length != 1) return ResultCode.INVALID_NUM_OF_ARGS;
         Client client = managersLocator.get(Client.class);
         try {
-            int id = Integer.parseInt(String.valueOf(args[0]));
-            Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_BY_ID, null));
+            int id = Integer.parseInt(args[0]);
+            // Исправлено: передаём id в запрос, а не null
+            Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_BY_ID, id));
             return r.getResultCode();
         } catch (NumberFormatException e) {
             return ResultCode.INVALID_ARGS;

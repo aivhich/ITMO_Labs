@@ -1,8 +1,10 @@
 package org.ivanrevich.network;
 
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.Deserializer;
 import org.ivanrevich.utils.FragmentInfo;
+import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -56,7 +58,7 @@ public class RequestHandler {
                     sender
             );
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new AppException(ResultCode.INVALID_REQUEST);
         }
     }
 }

@@ -1,11 +1,12 @@
 package org.ivanrevich.managers;
 
-import org.ivanrevich.exceptions.Exceptions;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.models.Coordinates;
 import org.ivanrevich.models.FuelType;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.models.VehicleType;
 import org.ivanrevich.utils.GenericBuilder;
+import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.validators.ValidateManager;
 
 import java.io.*;
@@ -17,7 +18,6 @@ import java.util.List;
 
 import static org.ivanrevich.validators.FileValidator.validateCollectionNewFile;
 
-
 /**
  * Реализация менеджера хранения в CSV-формате.
  * <p>
@@ -25,31 +25,32 @@ import static org.ivanrevich.validators.FileValidator.validateCollectionNewFile;
  * </p>
  *
  * @author Ivan Prokhorevich
- * @version 1.0
+ * @version 2.0
  * @see StorageManager
  * @see Vehicle
  */
 public class StorageManagerImpl implements StorageManager {
-
 
     public StorageManagerImpl(String path, QueueManager queueManager) {
         queueManager.set(load(path));
     }
 
     @Override
-    public void save(ArrayList<Vehicle> queue, String path){
+    public void save(ArrayList<Vehicle> queue, String path) {
         validateCollectionNewFile(path, ".csv", false);
         try (FileOutputStream fos = new FileOutputStream(path);
              OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
              BufferedWriter writer = new BufferedWriter(osw)) {
+
             StringBuilder data = new StringBuilder("id,name,x,y,creationDate,enginePower,numberOfWheels,type,fuelType\n");
-            for(Vehicle v: queue){
+            for (Vehicle v : queue) {
                 data.append(v.toCsvString()).append("\n");
             }
             writer.write(data.toString());
             writer.flush();
+
         } catch (IOException e) {
-            throw new RuntimeException(Exceptions.FILE_NOT_FOUND);
+            throw new AppException(ResultCode.FILE_NOT_FOUND);
         }
     }
 
@@ -57,12 +58,10 @@ public class StorageManagerImpl implements StorageManager {
     public List<Vehicle> load(String path) {
         validateCollectionNewFile(path, ".csv", true);
         ValidateManager validator = new org.ivanrevich.validators.ValidateManagerImpl();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                    new FileInputStream(path),
-                    StandardCharsets.UTF_8)
-        )) {
 
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8)
+        )) {
             List<Vehicle> loadedVehicles = new ArrayList<>();
             List<Integer> ids = new ArrayList<>();
             String line;
@@ -79,25 +78,24 @@ public class StorageManagerImpl implements StorageManager {
 
                 try {
                     int id = Integer.parseInt(parts[0].trim());
-                    if(!validator.checkNumValue(id, true, true, true, -1, Integer.MAX_VALUE, false, true) || ids.contains(id))
+                    if (!validator.checkNumValue(id, true, true, true, -1, Integer.MAX_VALUE, false, true)
+                            || ids.contains(id))
                         throw new Exception("LOADING_ERROR ID");
                     ids.add(id);
 
                     String name = parts[1].trim();
-                    if(!validator.checkStringValue(name, true, true, 0, 0))
+                    if (!validator.checkStringValue(name, true, true, 0, 0))
                         throw new Exception("LOADING_ERROR name");
 
                     double x = Double.parseDouble(parts[2].trim());
-                    if(!validator.checkNumValue(x, true, true, true, -371, Double.MAX_VALUE, false, true))
+                    if (!validator.checkNumValue(x, true, true, true, -371, Double.MAX_VALUE, false, true))
                         throw new Exception("LOADING_ERROR x");
 
                     float y = Float.parseFloat(parts[3].trim());
-                    if(!validator.checkNumValue(y, true, true, true, -Float.MAX_VALUE, 376, false, true))
+                    if (!validator.checkNumValue(y, true, true, true, -Float.MAX_VALUE, 376, false, true))
                         throw new Exception("LOADING_ERROR y");
 
-                    Date creationDate = Date.from(
-                            Instant.parse(parts[4].trim())
-                    );
+                    Date creationDate = Date.from(Instant.parse(parts[4].trim()));
 
                     float enginePower = Float.parseFloat(parts[5].trim());
                     if (!validator.checkNumValue(enginePower, true, true, true, 0, Float.MAX_VALUE, false, true))
@@ -109,15 +107,16 @@ public class StorageManagerImpl implements StorageManager {
 
                     VehicleType type = VehicleType.valueOf(parts[7].trim());
                     FuelType fuelType = FuelType.valueOf(parts[8].trim());
+
                     Vehicle v = GenericBuilder.of(Vehicle::new)
                             .with(Vehicle::setId, id)
                             .with(Vehicle::setName, name)
                             .with(Vehicle::setEnginePower, enginePower)
-                            .with(Vehicle::setCoordinates, (
+                            .with(Vehicle::setCoordinates,
                                     GenericBuilder.of(Coordinates::new)
-                                    .with(Coordinates::setX, x)
-                                    .with(Coordinates::setY, y)
-                                    .build()))
+                                            .with(Coordinates::setX, x)
+                                            .with(Coordinates::setY, y)
+                                            .build())
                             .with(Vehicle::setCreationDate, creationDate)
                             .with(Vehicle::setNumberOfWheels, numberOfWheels)
                             .with(Vehicle::setType, type)
@@ -126,18 +125,21 @@ public class StorageManagerImpl implements StorageManager {
 
                     loadedVehicles.add(v);
 
+                } catch (AppException e) {
+                    throw e;
                 } catch (Exception e) {
-                    System.out.println("Skipping invalid line: " + line);
+                    System.out.println("Пропускаем некорректную строку: " + line);
                     System.out.println(e.getMessage());
                 }
             }
+
             return loadedVehicles;
 
         } catch (FileNotFoundException e) {
-            System.out.println("The file to store the collection does not exist.");
+            System.out.println("Файл коллекции не найден, начинаем с пустой коллекции.");
+            return List.of();
         } catch (IOException e) {
-            throw new RuntimeException("Error reading file: " + path);
+            throw new AppException(ResultCode.FILE_NOT_FOUND, "Ошибка чтения файла: " + path);
         }
-        return List.of();
     }
 }

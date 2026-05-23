@@ -1,29 +1,23 @@
 package org.ivanrevich.managers;
 
-import org.ivanrevich.exceptions.Exceptions;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.models.Vehicle;
+import org.ivanrevich.utils.ResultCode;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
- * Интерфейс менеджера очереди транспортных средств.
- * <p>
- * Управляет коллекцией {@link Vehicle} с операциями добавления,
- * удаления, поиска и обновления.
- * </p>
+ * Реализация менеджера очереди транспортных средств.
  *
  * @author Ivan Prokhorevich
- * @version 1.0
- * @see Vehicle
- * @see QueueManagerImpl
+ * @version 2.0
  */
-public class QueueManagerImpl implements QueueManager{
-    private final PriorityQueue<Vehicle> priorityQueue = new PriorityQueue<Vehicle>();
+public class QueueManagerImpl implements QueueManager {
+    private final PriorityQueue<Vehicle> priorityQueue = new PriorityQueue<>();
     private final Instant initDate = Instant.now();
+
     @Override
     public void add(Vehicle vehicle) {
         vehicle.setId(generateId());
@@ -37,7 +31,8 @@ public class QueueManagerImpl implements QueueManager{
 
     @Override
     public void remove_by_id(int id) {
-        if(!priorityQueue.removeIf(vehicle -> vehicle.getId()==id)) throw  new NullPointerException(Exceptions.ID_ISN_EXIST);
+        boolean removed = priorityQueue.removeIf(vehicle -> vehicle.getId() == id);
+        if (!removed) throw new AppException(ResultCode.ID_ISN_EXIST);
     }
 
     @Override
@@ -57,13 +52,10 @@ public class QueueManagerImpl implements QueueManager{
 
     @Override
     public int generateId() {
-        AtomicInteger out= new AtomicInteger(-1);
-        if(!priorityQueue.isEmpty()) {
-            priorityQueue.forEach(vehicle -> {
-                out.set(Integer.max(vehicle.getId(), out.get()));
-            });
-        }
-        return out.get()+1;
+        return priorityQueue.stream()
+                .mapToInt(Vehicle::getId)
+                .max()
+                .orElse(0) + 1;
     }
 
     @Override
@@ -73,18 +65,25 @@ public class QueueManagerImpl implements QueueManager{
 
     @Override
     public Vehicle getById(int id) {
-        return priorityQueue.stream().filter(vehicle -> vehicle.getId()==id).findFirst().orElse(null);
+        return priorityQueue.stream()
+                .filter(vehicle -> vehicle.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public void updateById(int id, Vehicle v) {
-        priorityQueue.removeIf(vehicle -> vehicle.getId()==id);
+        priorityQueue.removeIf(vehicle -> vehicle.getId() == id);
         priorityQueue.add(v);
     }
 
     @Override
-    public int size() { return priorityQueue.size(); }
+    public int size() {
+        return priorityQueue.size();
+    }
 
     @Override
-    public Instant getInitDate() { return initDate; }
+    public Instant getInitDate() {
+        return initDate;
+    }
 }

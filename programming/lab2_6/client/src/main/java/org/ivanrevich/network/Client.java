@@ -13,67 +13,101 @@ import java.nio.ByteBuffer;
 
 public class Client {
     private DatagramSocket socket;
-    private SocketAddress remoteServer;
-    private
-    Serializer serializer = new Serializer();
+    private final SocketAddress remoteServer;
+    private final Serializer serializer = new Serializer();
+    private static final int TIMEOUT_MS = 5000;
+    private static final int MAX_RETRIES = 3;
 
     public Client(SocketAddress remoteServer) throws IOException {
         this.remoteServer = remoteServer;
         this.socket = new DatagramSocket();
         socket.connect(remoteServer);
+        socket.setSoTimeout(TIMEOUT_MS);
     }
 
     public Response<?> sendObject(Request<?> request) throws IOException, ClassNotFoundException {
-        // 1. Send the request as before
+        IOException lastException = null;
+
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                return doSend(request);
+            } catch (SocketTimeoutException e) {
+                lastException = e;
+                System.err.println("[Client] Сервер недоступен, попытка " + attempt + "/" + MAX_RETRIES + "...");
+                if (attempt < MAX_RETRIES) {
+                    try {
+                        Thread.sleep(1000L * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Прервано во время ожидания повтора", ie);
+                    }
+                    reconnect();
+                }
+            }
+        }
+
+        throw new IOException("Сервер недоступен после " + MAX_RETRIES + " попыток", lastException);
+    }
+
+    private Response<?> doSend(Request<?> request) throws IOException, ClassNotFoundException {
         ByteBuffer data = serializer.serialize(request);
         Fragment fragment = new Fragment(data, 1024);
-        FragmentInfo fragmentInfoResponse = new FragmentInfo(fragment.getDataSize(), fragment.getChunksCount(), 1024);
+        FragmentInfo fragmentInfoRequest = new FragmentInfo(fragment.getDataSize(), fragment.getChunksCount(), 1024);
 
-
-        ByteBuffer infoBuffer = ByteBuffer.allocate(data.capacity());
-        infoBuffer.put(serializer.serialize(fragmentInfoResponse));
+        ByteBuffer infoBuffer = ByteBuffer.allocate(65536);
+        infoBuffer.put(serializer.serialize(fragmentInfoRequest));
         infoBuffer.flip();
         socket.send(new DatagramPacket(infoBuffer.array(), infoBuffer.limit()));
-        while(true){
+
+        while (true) {
             ByteBuffer buffer = fragment.send();
-            if(buffer == null) break;
+            if (buffer == null) break;
             socket.send(new DatagramPacket(buffer.array(), buffer.limit()));
         }
 
-
-
-        // 2. Receive FragmentInfoResponse (first datagram)
         byte[] infoBuf = new byte[65536];
         DatagramPacket infoPacket = new DatagramPacket(infoBuf, infoBuf.length);
         socket.receive(infoPacket);
         byte[] infoData = new byte[infoPacket.getLength()];
         System.arraycopy(infoPacket.getData(), 0, infoData, 0, infoData.length);
-        FragmentInfo fragmentInfo = (FragmentInfo)
-                new Deserializer<>().deserialize(infoData);
+        FragmentInfo fragmentInfo = new Deserializer<FragmentInfo>().deserialize(infoData);
 
-
-
-        // 3. Allocate array for the full response data
         int totalSize = fragmentInfo.getSize();
         byte[] fullData = new byte[totalSize];
         int offset = 0;
 
-        // 4. Receive each chunk
         for (int i = 0; i < fragmentInfo.getChunksCount(); i++) {
-            byte[] chunkBuf = new byte[fragmentInfo.getChunksSize()];
-            DatagramPacket chunkPacket;
-            if(fragmentInfo.getChunksSize()>totalSize) {
-                chunkPacket = new DatagramPacket(chunkBuf, totalSize);
-            }else{
-                chunkPacket = new DatagramPacket(chunkBuf, chunkBuf.length);
-            }
+            int chunkSize = fragmentInfo.getChunksSize();
+            byte[] chunkBuf = new byte[chunkSize];
+            int packetSize = (chunkSize > totalSize) ? totalSize : chunkSize;
+            DatagramPacket chunkPacket = new DatagramPacket(chunkBuf, packetSize);
             socket.receive(chunkPacket);
             int len = chunkPacket.getLength();
             System.arraycopy(chunkPacket.getData(), 0, fullData, offset, len);
             offset += len;
         }
 
-        // 5. Deserialize and return the complete Response
         return (Response<?>) new Deserializer<>().deserialize(fullData);
+    }
+
+    private void reconnect() {
+        try {
+            socket.close();
+            socket = new DatagramSocket();
+            socket.connect(remoteServer);
+            socket.setSoTimeout(TIMEOUT_MS);
+        } catch (IOException e) {
+            System.err.println("[Client] Ошибка при переподключении: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Закрывает сокет и освобождает ресурсы.
+     * Вызывать при завершении работы клиента.
+     */
+    public void close() {
+        if (socket != null && !socket.isClosed()) {
+            socket.close();
+        }
     }
 }

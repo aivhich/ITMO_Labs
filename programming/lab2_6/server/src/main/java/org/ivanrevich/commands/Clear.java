@@ -27,6 +27,13 @@ public class Clear implements Command{
     }
 
     @Override
+    public Result<?> run(String[] args) {
+        QueueManager queueManager = managersLocator.get(QueueManager.class);
+        queueManager.clear();
+        return new Result<>(ResultCode.SUCCESS, "Success", "Successfully clear collection");
+    }
+
+    @Override
     public String toString() {
         return "clear: clear collection";
     }

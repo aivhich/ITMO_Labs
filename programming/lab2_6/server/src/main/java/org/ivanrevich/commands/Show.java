@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
@@ -34,12 +35,28 @@ public class Show implements Command {
     public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
 
-        // Коллекция сортируется перед отправкой клиенту (требование задания)
         List<Vehicle> sorted = queueManager.getAll().stream()
                 .sorted()
                 .collect(Collectors.toList());
 
         return new Result<>(ResultCode.SUCCESS, "Success", sorted);
+    }
+
+    @Override
+    public Result run(String[] args) {
+        QueueManager queueManager =  managersLocator.get(QueueManager.class);
+        IOManager ioManager = managersLocator.get(IOManager.class);
+
+        List<Vehicle> vehicles = queueManager.getAll()
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+        for(Vehicle v: vehicles) {
+            ioManager.write(v.toString());
+        }
+        if(vehicles.isEmpty()){
+            ioManager.write("Priority queue is empty");
+        }return new Result<>(ResultCode.SUCCESS, "Success", vehicles);
     }
 
     @Override

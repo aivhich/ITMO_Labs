@@ -5,7 +5,6 @@ import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
-import org.ivanrevich.utils.ResultCode;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class ClientMain {
         managersLocator.register(Client.class, client);
         managersLocator.register(CommandManager.class, commandManager);
 
-        // Команда save убрана из клиента согласно заданию
         commandManager.registerCommands(
                 Map.ofEntries(
                         Map.entry(CommandType.ADD.getName(), new Add(managersLocator)),

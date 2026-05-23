@@ -66,6 +66,8 @@ public interface CommandManager {
      */
     Result<?> run(Request<?> r);
 
+    Result<?> run(String cmd);
+
     /**
      * Возвращает все зарегистрированные команды.
      *

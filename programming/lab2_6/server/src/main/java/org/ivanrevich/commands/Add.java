@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
@@ -57,5 +58,18 @@ public class Add implements Command {
         queueManager.add(vehicle);
         ///ioManager.write("Successfully created vehicle"); @DEPRECATED
         return new Result<Vehicle>(ResultCode.SUCCESS, "Successfully created vehicle", vehicle);
+    }
+
+    @Override
+    public Result<?> run(String[] args) {
+        QueueManager queueManager = managersLocator.get(QueueManager.class);
+        IOManager ioManager = managersLocator.get(IOManager.class);
+
+        Vehicle vehicle = (new org.ivanrevich.factory.VehicleFactory(ioManager)).createVehicle();
+        queueManager.add(vehicle);
+
+        ioManager.write("Successfully created vehicle");
+        return new Result<Vehicle>(ResultCode.SUCCESS, "Successfully created vehicle", vehicle);
+
     }
 }

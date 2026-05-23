@@ -10,7 +10,7 @@ public class Fragment {
     private int index = 0;
 
     public Fragment(ByteBuffer buffer, int chunkSize) {
-        this.size = buffer.limit(); // ❗ НЕ capacity
+        this.size = buffer.limit();
 
         for (int i = 0; i < buffer.limit(); i += chunkSize) {
             int end = Math.min(i + chunkSize, buffer.limit());

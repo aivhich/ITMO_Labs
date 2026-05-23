@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.ResultCode;
@@ -36,6 +37,18 @@ public class RemoveById implements Command{
         } catch (NumberFormatException e) {
             return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
         }
+    }
+
+    @Override
+    public Result<?> run(String[] args) {
+        QueueManager queueManager = managersLocator.get(QueueManager.class);
+        if(args.length!=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
+        try {
+            queueManager.remove_by_id(Integer.parseInt(args[0]));
+        } catch (NumberFormatException e) {
+            throw new AppException(ResultCode.INVALID_ARGS);
+        }
+        return new Result<>(ResultCode.SUCCESS, "Success", "");
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.responses.Result;
@@ -34,6 +35,18 @@ public class Help implements Command{
             out.append(c.toString()+"\n");
         }
         return new Result<>(ResultCode.SUCCESS, "Success", out.toString());
+    }
+
+    @Override
+    public Result<String> run(String[] args) {
+        IOManager ioManager = managersLocator.get(IOManager.class);
+        CommandManager commandManager = managersLocator.get(CommandManager.class);
+
+        ioManager.write("--- HELP ---");
+        for(Command c: commandManager.getRegistedCommands()){
+            ioManager.write(c.toString());
+        }
+        return new Result<>(ResultCode.SUCCESS, "Success", "");
     }
 
     @Override

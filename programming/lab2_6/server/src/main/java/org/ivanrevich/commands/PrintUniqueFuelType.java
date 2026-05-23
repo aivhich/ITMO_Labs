@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.FuelType;
 import org.ivanrevich.models.Vehicle;
@@ -36,6 +37,25 @@ public class PrintUniqueFuelType implements Command{
         Set<FuelType> uniqueFuelTypes = queueManager.getAll().stream()
                 .map(Vehicle::getFuelType)
                 .collect(Collectors.toSet());
+
+        return new Result<>(ResultCode.SUCCESS, "Success", uniqueFuelTypes);
+    }
+
+    @Override
+    public Result<?> run(String[] args) {
+        IOManager io = managersLocator.get(IOManager.class);
+        QueueManager queueManager = managersLocator.get(QueueManager.class);
+
+        Set<FuelType> uniqueFuelTypes = queueManager.getAll().stream()
+                .map(Vehicle::getFuelType)
+                .collect(Collectors.toSet());
+
+        if (uniqueFuelTypes.isEmpty()) {
+            io.write("Collection is empty, no fuel types available.");
+        } else {
+            io.write("Unique fuel types in collection:");
+            uniqueFuelTypes.forEach(ft -> io.write(" - " + ft));
+        }
 
         return new Result<>(ResultCode.SUCCESS, "Success", uniqueFuelTypes);
     }

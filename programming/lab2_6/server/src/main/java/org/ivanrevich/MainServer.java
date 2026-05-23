@@ -5,6 +5,7 @@ import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Server;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
+import org.ivanrevich.utils.TerminalConfigurator;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -25,14 +26,19 @@ public class MainServer {
         logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
 
         QueueManager queueManager = new QueueManagerImpl();
+        TerminalConfigurator terminalConfigurator = new TerminalConfigurator();
+        boolean isRawMode = TerminalConfigurator.enableRawMode();
+        IOManager ioManager = new IOManagerImpl(isRawMode);
         StorageManager storageManager = new StorageManagerImpl(path, queueManager);
 
         ManagersLocator managersLocator = new ManagersLocator();
+        managersLocator.register(IOManager.class, ioManager);
         managersLocator.register(StorageManager.class, storageManager);
         managersLocator.register(QueueManager.class, queueManager);
 
         CommandManager commandManager = new CommandManagerImpl();
         managersLocator.register(CommandManager.class, commandManager);
+        
 
         commandManager.registerCommands(
                 Map.ofEntries(
@@ -55,7 +61,6 @@ public class MainServer {
                 )
         );
 
-        // Сохраняем коллекцию при завершении работы сервера (Ctrl+C, kill и т.д.)
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию в " + path);
             try {

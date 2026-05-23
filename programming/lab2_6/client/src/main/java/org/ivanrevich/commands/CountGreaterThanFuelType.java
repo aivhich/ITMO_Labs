@@ -1,7 +1,7 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.IOManager;
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.models.FuelType;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
@@ -39,7 +39,6 @@ public class CountGreaterThanFuelType implements Command {
             IOManager ioManager = managersLocator.get(IOManager.class);
             Client client = managersLocator.get(Client.class);
 
-            // Сервер сам считает и возвращает long — не фильтруем повторно на клиенте
             Response<?> response = client.sendObject(
                     new Request<>(CommandType.COUNT_GREATER_THAN_FUEL_TYPE, fuelType)
             );

@@ -1,6 +1,7 @@
 package org.ivanrevich.network;
 
 import org.ivanrevich.managers.IOManager;
+import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.ManagersLocator;
@@ -10,6 +11,7 @@ import org.ivanrevich.utils.ResultCode;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,11 +44,10 @@ public class Server {
             while (running) {
                 try {
                     String cmd = ioManager.read();
-
                     if (cmd == null) break;
-                    if (!cmd.isEmpty())
+                    if (!cmd.isEmpty()) {
                         commandManager.run(cmd);
-
+                    }
                 } catch (Exception e) {
                     logger.warning(e.getMessage());
                 }
@@ -115,9 +116,11 @@ public class Server {
 
             }
         }
+        stop();
     }
 
     public void stop() throws IOException {
+        if(!running) return;
         running = false;
         logger.log(Level.INFO, "Остановка сервера...");
         if (selector != null) selector.close();

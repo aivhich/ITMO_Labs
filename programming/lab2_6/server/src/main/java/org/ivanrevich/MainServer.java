@@ -7,7 +7,10 @@ import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.TerminalConfigurator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +18,7 @@ public class MainServer {
     private static final Logger logger = Logger.getLogger(MainServer.class.getName());
 
     public static void main(String[] args) throws Exception {
+        AtomicBoolean collectionWasSaved = new AtomicBoolean(false);
         if (args.length < 2) {
             System.err.println("Использование: MainServer <port> <path-to-csv>");
             System.exit(1);
@@ -60,21 +64,25 @@ public class MainServer {
                         Map.entry(CommandType.UPDATE.getName(), new Update(managersLocator))
                 )
         );
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Thread save = new Thread(() -> {
             logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию в " + path);
             try {
-                commandManager.run(new Request<>(CommandType.SAVE, null));
+                commandManager.run(new Request<>(CommandType.SAVE, new ArrayList()));
+                collectionWasSaved.set(true);
                 logger.log(Level.INFO, "Коллекция успешно сохранена");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Ошибка при сохранении коллекции: " + e.getMessage());
             }
-        }));
+        });
+        Runtime.getRuntime().addShutdownHook(save);
 
         logger.log(Level.INFO, "Сервер успешно инициализирован, ожидаю подключений...");
 
         Server server = new Server(port, managersLocator);
         managersLocator.register(Server.class, server);
         server.run();
+        if(!collectionWasSaved.get()) {
+            save.start();
+        }
     }
 }

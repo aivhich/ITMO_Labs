@@ -1,9 +1,6 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.exceptions.AppException;
-import org.ivanrevich.factory.VehicleFactory;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
@@ -49,34 +46,6 @@ public class Update implements Command{
             return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
         }
     }
-
-    @Override
-    public Result run(String[] args) {
-        if(args.length!=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
-
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-
-        try {
-            int id = Integer.parseInt(args[0]);
-
-            if(!queueManager.isExistWithId(id)) {
-                throw new AppException(ResultCode.ID_ISN_EXIST);
-            }
-
-            Vehicle old = queueManager.getById(id);
-            ioManager.write(String.format("--- Updating element with id=%s ---", args[0]));
-            ioManager.write(old.toString());
-            queueManager.updateById(id,  (new VehicleFactory(ioManager)).updateVehicle(old));
-
-            ioManager.write("Successfully updated vehicle name: " + old.getId());
-            return new Result<>(ResultCode.SUCCESS, "Success", "Successfully updated vehicle "+id);
-
-        } catch (NumberFormatException e) {
-            return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
-        }
-    }
-
 
     @Override
     public String toString() {

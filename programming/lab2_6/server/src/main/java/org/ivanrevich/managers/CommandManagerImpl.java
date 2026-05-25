@@ -2,7 +2,6 @@ package org.ivanrevich.managers;
 
 import org.ivanrevich.commands.Command;
 import org.ivanrevich.exceptions.AppException;
-import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.CommandObj;
@@ -48,20 +47,6 @@ public class CommandManagerImpl implements CommandManager {
         history.add(new CommandObj(commandName, new String[]{}));
 
         return result;
-    }
-
-    @Override
-    public Result<?> run(String cmd) {
-        CommandObj parsedCommand = CommandManager.parseCommand(cmd);
-        if(availableCommands.containsKey(parsedCommand.name())){
-            Result<?> r = availableCommands.get(parsedCommand.name()).run(parsedCommand.args());
-            if( ResultCode.SUCCESS != r.getResultCode()){
-                System.out.println("Command doesn't return success code");
-            }
-            history.add(parsedCommand);
-            return r;
-        }
-        throw new AppException(ResultCode.COMMAND_NOT_FOUND);
     }
 
     @Override

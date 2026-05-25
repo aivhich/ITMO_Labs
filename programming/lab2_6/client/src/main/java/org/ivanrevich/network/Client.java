@@ -16,7 +16,7 @@ public class Client {
     private final SocketAddress remoteServer;
     private final Serializer serializer = new Serializer();
     private static final int TIMEOUT_MS = 5000;
-    private static final int MAX_RETRIES = 5;
+    private static final int MAX_RETRIES = 3;
 
     public Client(SocketAddress remoteServer) throws IOException {
         this.remoteServer = remoteServer;

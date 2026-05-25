@@ -146,6 +146,7 @@ public class IOManagerImpl implements IOManager {
                 }
                 if (isUpdateMode && (newValue == null || newValue.toString().isEmpty())) return value;
             } catch (AppException e) {
+                // COMMAND_CANCELLED пробрасываем наверх — не глотаем
                 throw e;
             } catch (Exception e) {
                 write(e.getMessage());

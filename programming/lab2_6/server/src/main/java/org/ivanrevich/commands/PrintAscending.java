@@ -1,7 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
@@ -38,16 +37,6 @@ public class PrintAscending implements Command{
         List<Vehicle> vehicleList = new ArrayList<>(queueManager.getAll());
         Collections.sort(vehicleList);
 //        vehicleList.forEach(vehicle -> ioManager.write(vehicle.toString()));
-        return new Result<>(ResultCode.SUCCESS, "Success", vehicleList);
-    }
-
-    @Override
-    public Result<?> run(String[] args) {
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-        List<Vehicle> vehicleList = new ArrayList<>(queueManager.getAll());
-        Collections.sort(vehicleList);
-        vehicleList.forEach(vehicle -> ioManager.write(vehicle.toString()));
         return new Result<>(ResultCode.SUCCESS, "Success", vehicleList);
     }
 

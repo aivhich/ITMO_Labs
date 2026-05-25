@@ -1,6 +1,5 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
@@ -50,40 +49,6 @@ public class Info implements Command{
                         "init_date", dateStr
                 )
         );
-    }
-
-    @Override
-    public Result<?> run(String[] args) {
-        IOManager io = managersLocator.get(IOManager.class);
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-
-        io.write("Collection type: " + queueManager.getAll().getClass().getSimpleName());
-        io.write("Number of elements: " + queueManager.size());
-
-        try{
-            String dateStr = queueManager.getAll().stream()
-                    .min(Comparator.comparing(Vehicle::getCreationDate))
-                    .orElseThrow().getCreationDate()
-                    .toString();
-            io.write("Date of first element: " + dateStr);
-            return new Result<>(ResultCode.SUCCESS, "Success",
-                    Map.of(
-                            "type", queueManager.getAll().getClass().getSimpleName(),
-                            "count", String.valueOf(queueManager.size()),
-                            "init_date", dateStr
-                    )
-            );
-        } catch (Exception e){
-            io.write("Collection is empty, no creation date available.");
-            return new Result<>(ResultCode.SUCCESS, "Success",
-                    Map.of(
-                            "type", queueManager.getAll().getClass().getSimpleName(),
-                            "count", String.valueOf(queueManager.size()),
-                            "init_date", ""
-                    )
-            );
-        }
-
     }
 
     @Override

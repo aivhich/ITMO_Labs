@@ -29,12 +29,6 @@ public class Exit implements Command{
     }
 
     @Override
-    public Result<?> run(String[] args) {
-        System.exit(0);
-        return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
-    }
-
-    @Override
     public String toString() {
         return "exit: terminate the program (without saving to file)";
     }

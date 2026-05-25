@@ -1,10 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.exceptions.AppException;
-import org.ivanrevich.managers.FileIOManagerImpl;
-import org.ivanrevich.managers.IOManager;
-import org.ivanrevich.managers.IOManagerStack;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
@@ -28,28 +24,14 @@ public class ExecuteScript implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
-        IOManagerStack stack = locator.get(IOManagerStack.class);
+        //IOManagerStack stack = locator.get(IOManagerStack.class);
 
-        String[] args = (String[]) r.getArgs();
-        if(args.length !=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
+        //if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
+        //TODO
 
-        IOManager fileIO = new FileIOManagerImpl(args[0]);
-        stack.push(fileIO);
-        locator.register(IOManager.class, fileIO);
-
-        return new Result(ResultCode.SUCCESS, "Success", "");
-    }
-
-    @Override
-    public Result<?> run(String[] args) {
-        IOManagerStack stack = locator.get(IOManagerStack.class);
-
-        if(args.length !=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
-        //TODO PATH CHECKING
-
-        IOManager fileIO = new FileIOManagerImpl(args[0]);
-        stack.push(fileIO);
-        locator.register(IOManager.class, fileIO);
+        //IOManager fileIO = new FileIOManagerImpl(args[0]);
+        //stack.push(fileIO);
+        //locator.register(IOManager.class, fileIO);
 
         return new Result(ResultCode.SUCCESS, "Success", "");
     }

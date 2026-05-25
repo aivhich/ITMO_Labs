@@ -1,7 +1,6 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
 import org.ivanrevich.managers.StorageManager;
 
@@ -36,27 +35,13 @@ public class Save implements Command{
     public Result<?> run(Request<?> r) {
         StorageManager storageManager = managersLocator.get(StorageManager.class);
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-
-        if(((ArrayList<String>)r.getArgs()).size()==1) path= ((ArrayList<String>) r.getArgs()).get(0);
-
-        storageManager.save(new ArrayList<>(queueManager.getAll()), path);
-        ioManager.write("Saved "+path);
-
-        return new Result(ResultCode.SUCCESS, "Success", path);
-    }
-
-    @Override
-    public Result run(String[] args) {
-        StorageManager storageManager = managersLocator.get(StorageManager.class);
-        QueueManager queueManager = managersLocator.get(QueueManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
-
-        if(args.length==1) path=args[0];
+//        IOManager ioManager = managersLocator.get(IOManager.class);
+        //TODO WATCH DOCS
+        //if(args.length==1) path=args[0];
 
         storageManager.save(new ArrayList<>(queueManager.getAll()), path);
+//        ioManager.write("Saved "+path);
 
-        ioManager.write("Saved "+path);
         return new Result(ResultCode.SUCCESS, "Success", path);
     }
 

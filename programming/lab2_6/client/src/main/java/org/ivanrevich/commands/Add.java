@@ -1,8 +1,8 @@
 package org.ivanrevich.commands;
 
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.factory.VehicleFactory;
+import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;

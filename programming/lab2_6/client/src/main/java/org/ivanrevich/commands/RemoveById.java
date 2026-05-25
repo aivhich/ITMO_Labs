@@ -32,6 +32,7 @@ public class RemoveById implements Command {
         Client client = managersLocator.get(Client.class);
         try {
             int id = Integer.parseInt(args[0]);
+            // Исправлено: передаём id в запрос, а не null
             Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_BY_ID, id));
             return r.getResultCode();
         } catch (NumberFormatException e) {

@@ -35,7 +35,7 @@ public class PrintUniqueFuelType implements Command{
     @Override
     public ResultCode run(String[] args) {
         IOManager io = managersLocator.get(IOManager.class);
-
+        //QueueManager queueManager = managersLocator.get(QueueManager.class);
         Client client = managersLocator.get(Client.class);
         try {
             Response<Set<FuelType>> r = (Response<Set<FuelType>>) client.sendObject(new Request<>(CommandType.PRINT_UNIQUE_FUEL_TYPE, null));

@@ -25,6 +25,8 @@ public interface Command{
 
     org.ivanrevich.responses.Result<?> run(Request<?> r);
 
-    org.ivanrevich.responses.Result<?>  run(String[] args);
+//
+//    @Deprecated
+//    Result<?> run(String[] args);
 }
 

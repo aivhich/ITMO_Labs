@@ -1,6 +1,5 @@
 package org.ivanrevich.network;
 
-import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.ManagersLocator;
@@ -34,18 +33,11 @@ public class Server {
 
     public void run() throws Exception {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
 
         while (running) {
-
-            String cmd = ioManager.read();
-            if (cmd == null) break;
-            if (!cmd.isEmpty())
-                commandManager.run(cmd);
-
             selector.select();
             Set<SelectionKey> keys = selector.selectedKeys();
 

@@ -101,7 +101,7 @@ public class FileIOManagerImpl implements IOManager {
     @Override
     public Long askLong(String text) {
         write(text);
-        String s = read();
+        String s = read(); // исправлен баг двойного read()
         try {
             return Long.parseLong(s);
         } catch (NumberFormatException e) {

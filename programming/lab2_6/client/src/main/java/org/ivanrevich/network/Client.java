@@ -15,7 +15,7 @@ public class Client {
     private DatagramSocket socket;
     private final SocketAddress remoteServer;
     private final Serializer serializer = new Serializer();
-    private static final int TIMEOUT_MS = 5000;
+    private static final int TIMEOUT_MS = 1000;
     private static final int MAX_RETRIES = 5;
 
     public Client(SocketAddress remoteServer) throws IOException {
@@ -100,11 +100,6 @@ public class Client {
             System.err.println("[Client] Ошибка при переподключении: " + e.getMessage());
         }
     }
-
-    /**
-     * Закрывает сокет и освобождает ресурсы.
-     * Вызывать при завершении работы клиента.
-     */
     public void close() {
         if (socket != null && !socket.isClosed()) {
             socket.close();

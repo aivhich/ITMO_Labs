@@ -38,13 +38,23 @@ public class Server {
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
+        new Thread(() -> {
+            while (running) {
+                try {
+                    String cmd = ioManager.read();
 
+                    if (cmd == null) break;
+                    if (!cmd.isEmpty())
+                        commandManager.run(cmd);
+
+                } catch (Exception e) {
+                    logger.warning(e.getMessage());
+                }
+            }
+        }).start();
         while (running) {
 
-            String cmd = ioManager.read();
-            if (cmd == null) break;
-            if (!cmd.isEmpty())
-                commandManager.run(cmd);
+
 
             selector.select();
             Set<SelectionKey> keys = selector.selectedKeys();

@@ -9,6 +9,7 @@ import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -35,11 +36,10 @@ public class Show implements Command {
     public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
 
-        List<Vehicle> sorted = queueManager.getAll().stream()
-                .sorted()
-                .collect(Collectors.toList());
 
-        return new Result<>(ResultCode.SUCCESS, "Success", sorted);
+        PriorityQueue <Vehicle> vehicles = queueManager.getAll();
+
+        return new Result<>(ResultCode.SUCCESS, "Success", vehicles);
     }
 
     @Override
@@ -47,10 +47,7 @@ public class Show implements Command {
         QueueManager queueManager =  managersLocator.get(QueueManager.class);
         IOManager ioManager = managersLocator.get(IOManager.class);
 
-        List<Vehicle> vehicles = queueManager.getAll()
-                .stream()
-                .sorted()
-                .collect(Collectors.toList());
+        PriorityQueue <Vehicle> vehicles = queueManager.getAll();
         for(Vehicle v: vehicles) {
             ioManager.write(v.toString());
         }

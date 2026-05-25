@@ -5,6 +5,8 @@ import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
+import java.io.Serial;
+
 /**
  * Команда завершения программы.
  * <p>
@@ -30,6 +32,6 @@ public class Exit implements Command{
 
     @Override
     public String toString() {
-        return "exit: terminate the program (without saving to file)";
+        return "exit: terminate the program";
     }
 }

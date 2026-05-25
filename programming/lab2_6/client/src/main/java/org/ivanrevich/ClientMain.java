@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ClientMain {
     public static void main(String[] args) throws Exception {
-        Client client = new Client(new InetSocketAddress("localhost", 8000));
+        Client client = new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])));
         boolean workMode = true;
 
         ManagersLocator managersLocator = new ManagersLocator();

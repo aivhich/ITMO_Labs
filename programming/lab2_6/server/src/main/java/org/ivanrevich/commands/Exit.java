@@ -1,9 +1,12 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.network.Server;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
+
+import java.io.IOException;
 
 /**
  * Команда завершения программы.
@@ -24,13 +27,25 @@ public class Exit implements Command{
 
     @Override
     public Result<?> run(Request<?> request) {
-        System.exit(0);
+        Server server = managersLocator.get(Server.class);
+        try {
+            server.stop();
+            //System.exit(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
     }
 
     @Override
     public Result<?> run(String[] args) {
-        System.exit(0);
+        Server server = managersLocator.get(Server.class);
+        try {
+            server.stop();
+            //System.exit(0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return new Result<>(ResultCode.SUCCESS, "Success", "success exit app");
     }
 

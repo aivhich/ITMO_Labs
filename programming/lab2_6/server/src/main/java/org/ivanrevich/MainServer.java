@@ -74,6 +74,7 @@ public class MainServer {
         logger.log(Level.INFO, "Сервер успешно инициализирован, ожидаю подключений...");
 
         Server server = new Server(port, managersLocator);
+        managersLocator.register(Server.class, server);
         server.run();
     }
 }

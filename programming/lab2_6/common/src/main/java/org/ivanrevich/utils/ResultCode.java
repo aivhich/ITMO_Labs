@@ -50,6 +50,16 @@ public enum ResultCode {
         this.message = message;
     }
 
+    public static ResultCode fromMessage(String message) {
+        for (ResultCode code : values()) {
+            if (code.message.equals(message)) {
+                return code;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown message: " + message);
+    }
+
     public String getMessage() {
         return message;
     }

@@ -1,6 +1,10 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.exceptions.AppException;
+import org.ivanrevich.managers.FileIOManagerImpl;
+import org.ivanrevich.managers.IOManager;
+import org.ivanrevich.managers.IOManagerStack;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
@@ -24,14 +28,14 @@ public class ExecuteScript implements Command{
 
     @Override
     public ResultCode run(String[] args) {
-        //IOManagerStack stack = locator.get(IOManagerStack.class);
+        IOManagerStack stack = locator.get(IOManagerStack.class);
 
-        //if(args.length !=1) throw new RuntimeException(Exceptions.INVALID_NUM_OF_ARGS);
-        //TODO
+        if(args.length !=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
 
-        //IOManager fileIO = new FileIOManagerImpl(args[0]);
-        //stack.push(fileIO);
-        //locator.register(IOManager.class, fileIO);
+
+        IOManager fileIO = new FileIOManagerImpl(args[0]);
+        stack.push(fileIO);
+        locator.register(IOManager.class, fileIO);
 
         return ResultCode.SUCCESS;
 

@@ -1,6 +1,7 @@
 package org.ivanrevich.network;
 
 import org.ivanrevich.managers.IOManager;
+import org.ivanrevich.managers.IOManagerStack;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.managers.CommandManager;
@@ -21,6 +22,7 @@ public class Server {
     private final DatagramChannel channel;
     private final Selector selector;
     private boolean running;
+    private boolean isRawMode;
     private final ManagersLocator managersLocator;
     private final Logger logger = Logger.getLogger(Server.class.getName());
 
@@ -37,12 +39,12 @@ public class Server {
 
     public void run() throws Exception {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
-        IOManager ioManager = managersLocator.get(IOManager.class);
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
         new Thread(() -> {
             while (running) {
+                IOManager ioManager = managersLocator.get(IOManager.class);
                 try {
                     String cmd = ioManager.read();
                     if (cmd == null) break;
@@ -50,11 +52,39 @@ public class Server {
                         commandManager.run(cmd);
                     }
                 } catch (Exception e) {
-                    if(Objects.equals(e.getMessage(), ResultCode.COMMAND_CANCELLED.toString())){
-                        commandManager.run("save"); // TODO вроде работает на экстренные выключения, но может давать сбой
+                    if(e.getMessage().equals(ResultCode.COMMAND_CANCELLED.toString())){
+                        commandManager.run("save");
                         System.exit(0);
                     }
-                    logger.warning(e.getMessage());
+                    switch (ResultCode.fromMessage(e.getMessage())) {
+                        case COMMAND_CANCELLED,COMMAND_SOFT_CANCELLED ->{
+                            if(isRawMode) {
+                                ioManager.write("Command cancelled");
+                            }
+                        }
+                        case SCRIPT_END -> {
+                            IOManagerStack stack = managersLocator.get(IOManagerStack.class);
+                            stack.pop();
+                            managersLocator.register(IOManager.class, stack.current());
+                        }
+                        case SCRIPT_ERROR -> {
+                            IOManagerStack stack = managersLocator.get(IOManagerStack.class);
+                            stack.pop();
+                            ioManager.write("");
+                            managersLocator.register(IOManager.class, stack.current());
+                            ioManager.write("Script execute error");
+                        }
+
+                        case COMMAND_NOT_FOUND -> ioManager.write("Such command not found");
+                        case COMMAND_PARSE_ERROR -> ioManager.write("Command parse error");
+                        case RECURRENT_SCRIPT_ERROR-> ioManager.write("You're trying to start recurrent scripts");
+                        case MANY_INCORRECT_ATTEMPTS -> ioManager.write("You're trying to enter incorrect data so many times");
+                        case INVALID_NUM_OF_ARGS ->  ioManager.write("Invalid number of arguments");
+                        case INVALID_ARGS -> ioManager.write("Invalid arguments");
+                        case ID_ISN_EXIST -> ioManager.write("Element with such id is not exists");
+                        case FILE_NOT_FOUND -> ioManager.write("File unreachable. Check file permission and path");
+                        default -> ioManager.write(e.getMessage());
+                    }
                 }
             }
         }).start();

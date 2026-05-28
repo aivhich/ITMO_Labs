@@ -38,12 +38,12 @@ public class MainServer {
 
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(IOManager.class, ioManager);
+        managersLocator.register(IOManagerStack.class, ioManagerStack);
         managersLocator.register(StorageManager.class, storageManager);
         managersLocator.register(QueueManager.class, queueManager);
 
         CommandManager commandManager = new CommandManagerImpl();
         managersLocator.register(CommandManager.class, commandManager);
-        managersLocator.register(IOManagerStack.class, ioManagerStack);
 
         commandManager.registerCommands(
                 Map.ofEntries(

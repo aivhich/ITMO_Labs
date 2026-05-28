@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,10 @@ public class Server {
                         commandManager.run(cmd);
                     }
                 } catch (Exception e) {
+                    if(Objects.equals(e.getMessage(), ResultCode.COMMAND_CANCELLED.toString())){
+                        commandManager.run("save"); // TODO вроде работает на экстренные выключения, но может давать сбой
+                        System.exit(0);
+                    }
                     logger.warning(e.getMessage());
                 }
             }
@@ -93,7 +98,6 @@ public class Server {
                         } catch (Exception e) {
                             logger.log(Level.WARNING, "Ошибка при обработке команды "
                                     + request.getCommandType() + ": " + e.getMessage(), e);
-
                             if (sender != null) {
                                 try {
                                     ResponseHandler.apply(key,
@@ -113,7 +117,6 @@ public class Server {
                     }
                 }
             } catch (Exception e) {
-
             }
         }
         stop();

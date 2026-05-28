@@ -61,8 +61,11 @@ public class Client {
 
         while (true) {
             ByteBuffer buffer = fragment.send();
-            if (buffer == null) break;
-            socket.send(new DatagramPacket(buffer.array(), buffer.limit()));
+            if(buffer == null) break;
+
+            byte[] chunkBytes = new byte[buffer.remaining()];
+            buffer.get(chunkBytes);
+            socket.send(new DatagramPacket(chunkBytes, chunkBytes.length));
         }
 
         byte[] infoBuf = new byte[65536];
@@ -79,7 +82,7 @@ public class Client {
         for (int i = 0; i < fragmentInfo.getChunksCount(); i++) {
             int chunkSize = fragmentInfo.getChunksSize();
             byte[] chunkBuf = new byte[chunkSize];
-            int packetSize = (chunkSize > totalSize) ? totalSize : chunkSize;
+            int packetSize = Math.min(chunkSize, totalSize);
             DatagramPacket chunkPacket = new DatagramPacket(chunkBuf, packetSize);
             socket.receive(chunkPacket);
             int len = chunkPacket.getLength();

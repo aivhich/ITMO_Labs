@@ -32,7 +32,9 @@ public class Help implements Command{
 
         StringBuilder out = new StringBuilder("--- HELP ---\n");
         for(Command c: commandManager.getRegistedCommands()){
-            out.append(c.toString()+"\n");
+            if(!(c instanceof Save)){
+                out.append(c.toString()+"\n");
+            }
         }
         return new Result<>(ResultCode.SUCCESS, "Success", out.toString());
     }

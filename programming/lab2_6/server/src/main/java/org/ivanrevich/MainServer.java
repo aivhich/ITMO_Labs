@@ -33,6 +33,7 @@ public class MainServer {
         TerminalConfigurator terminalConfigurator = new TerminalConfigurator();
         boolean isRawMode = TerminalConfigurator.enableRawMode();
         IOManager ioManager = new IOManagerImpl(isRawMode);
+        IOManagerStack ioManagerStack = new IOManagerStack(ioManager);
         StorageManager storageManager = new StorageManagerImpl(path, queueManager);
 
         ManagersLocator managersLocator = new ManagersLocator();
@@ -42,7 +43,7 @@ public class MainServer {
 
         CommandManager commandManager = new CommandManagerImpl();
         managersLocator.register(CommandManager.class, commandManager);
-        
+        managersLocator.register(IOManagerStack.class, ioManagerStack);
 
         commandManager.registerCommands(
                 Map.ofEntries(

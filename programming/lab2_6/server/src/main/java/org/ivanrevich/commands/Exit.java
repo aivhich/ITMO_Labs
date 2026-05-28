@@ -51,6 +51,6 @@ public class Exit implements Command{
 
     @Override
     public String toString() {
-        return "exit: terminate the program (without saving to file)";
+        return "exit: terminate the program";
     }
 }

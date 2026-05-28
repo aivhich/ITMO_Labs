@@ -4,7 +4,7 @@ public enum CommandType {
     ADD("add"),
     CLEAR("clear"),
     COUNT_GREATER_THAN_FUEL_TYPE("count_greater_than_fuel_type"),
-    EXECUTE("execute"),
+    EXECUTE("execute_script"),
     EXIT("exit"),
     HELP("help"),
     HISTORY("history"),

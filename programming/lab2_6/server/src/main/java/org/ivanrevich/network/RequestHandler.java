@@ -50,10 +50,9 @@ public class RequestHandler {
             fullData.put(chunkData);
             received++;
         }
-
         try {
-            return new ReadResult(
-                    (Request<?>) new Deserializer<>()
+            Request<?> r = new Deserializer<Request<?>>().deserialize(fullData.array());
+            return new ReadResult(new Deserializer<Request<?>>()
                             .deserialize(fullData.array()),
                     sender
             );

@@ -34,8 +34,8 @@ public class RemoveById implements Command{
             queueManager.remove_by_id(id);
 
             return new Result<>(ResultCode.SUCCESS, "Success", id);
-        } catch (NumberFormatException e) {
-            return new Result<>(ResultCode.INVALID_ARGS, "Fail", "Invalid arguments apply to command.");
+        } catch (AppException e) {
+            return new Result<>(ResultCode.ID_ISN_EXIST, "Fail", e.getMessage());
         }
     }
 
@@ -45,8 +45,8 @@ public class RemoveById implements Command{
         if(args.length!=1) throw new AppException(ResultCode.INVALID_NUM_OF_ARGS);
         try {
             queueManager.remove_by_id(Integer.parseInt(args[0]));
-        } catch (NumberFormatException e) {
-            throw new AppException(ResultCode.INVALID_ARGS);
+        } catch (AppException e) {
+            return new Result<>(ResultCode.ID_ISN_EXIST, "Fail", e.getMessage());
         }
         return new Result<>(ResultCode.SUCCESS, "Success", "");
     }

@@ -1,5 +1,6 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.commands.Command;
 import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.requests.CommandType;
@@ -28,6 +29,11 @@ import java.util.Map;
 public class CommandManagerImpl implements CommandManager {
     private final HashMap<String, Command> availableCommands = new HashMap<>();
     private final ArrayList<CommandObj> history = new ArrayList<>();
+    private ManagersLocator managersLocator;
+
+    public CommandManagerImpl(ManagersLocator managersLocator) {
+        this.managersLocator=  managersLocator;
+    }
 
     @Override
     public ArrayList<CommandObj> getHistory() {
@@ -52,11 +58,12 @@ public class CommandManagerImpl implements CommandManager {
 
     @Override
     public Result<?> run(String cmd) {
+        IOManager ioManager = managersLocator.get(IOManager.class);
         CommandObj parsedCommand = CommandManager.parseCommand(cmd);
         if(availableCommands.containsKey(parsedCommand.name())){
             Result<?> r = availableCommands.get(parsedCommand.name()).run(parsedCommand.args());
             if( ResultCode.SUCCESS != r.getResultCode()){
-                System.out.println("Command doesn't return success code");
+                ioManager.write(r.getResultCode().toString());
             }
             history.add(parsedCommand);
             return r;

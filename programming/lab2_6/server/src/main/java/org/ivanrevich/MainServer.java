@@ -42,26 +42,26 @@ public class MainServer {
         managersLocator.register(StorageManager.class, storageManager);
         managersLocator.register(QueueManager.class, queueManager);
 
-        CommandManager commandManager = new CommandManagerImpl();
+        CommandManager commandManager = new CommandManagerImpl(managersLocator);
         managersLocator.register(CommandManager.class, commandManager);
 
         commandManager.registerCommands(
                 Map.ofEntries(
-                        Map.entry(CommandType.ADD.getName(), new Add(managersLocator)),
-                        Map.entry(CommandType.CLEAR.getName(), new Clear(managersLocator)),
+                        Map.entry(CommandType.ADD.getName(), new Add(managersLocator)), //checked c-s
+                        Map.entry(CommandType.CLEAR.getName(), new Clear(managersLocator)), // checked c-s
                         Map.entry(CommandType.COUNT_GREATER_THAN_FUEL_TYPE.getName(), new CountGreaterThanFuelType(managersLocator)),
-                        Map.entry(CommandType.EXECUTE.getName(), new ExecuteScript(managersLocator)),
-                        Map.entry(CommandType.EXIT.getName(), new Exit(managersLocator)),
-                        Map.entry(CommandType.HELP.getName(), new Help(managersLocator)),
+                        Map.entry(CommandType.EXECUTE.getName(), new ExecuteScript(managersLocator)), // checked c-s
+                        Map.entry(CommandType.EXIT.getName(), new Exit(managersLocator)), // checked c-s
+                        Map.entry(CommandType.HELP.getName(), new Help(managersLocator)), // chedked c-s
                         Map.entry(CommandType.HISTORY.getName(), new History(managersLocator)),
-                        Map.entry(CommandType.INFO.getName(), new Info(managersLocator)),
+                        Map.entry(CommandType.INFO.getName(), new Info(managersLocator)), // checked c-s
                         Map.entry(CommandType.PRINT_ASCENDING.getName(), new PrintAscending(managersLocator)),
                         Map.entry(CommandType.PRINT_UNIQUE_FUEL_TYPE.getName(), new PrintUniqueFuelType(managersLocator)),
-                        Map.entry(CommandType.REMOVE_BY_ID.getName(), new RemoveById(managersLocator)),
+                        Map.entry(CommandType.REMOVE_BY_ID.getName(), new RemoveById(managersLocator)), // checked c-s
                         Map.entry(CommandType.REMOVE_HEAD.getName(), new RemoveHead(managersLocator)),
                         Map.entry(CommandType.REMOVE_LOWER.getName(), new RemoveLower(managersLocator)),
-                        Map.entry(CommandType.SAVE.getName(), new Save(managersLocator, path)),
-                        Map.entry(CommandType.SHOW.getName(), new Show(managersLocator)),
+                        Map.entry(CommandType.SAVE.getName(), new Save(managersLocator, path)), // checked c-s
+                        Map.entry(CommandType.SHOW.getName(), new Show(managersLocator)), // checked c-s
                         Map.entry(CommandType.UPDATE.getName(), new Update(managersLocator))
                 )
         );

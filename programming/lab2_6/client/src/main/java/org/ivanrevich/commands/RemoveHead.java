@@ -7,6 +7,7 @@ import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
+import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
@@ -39,8 +40,13 @@ public class RemoveHead implements Command{
         Client client = managersLocator.get(Client.class);
 
         try {
-            Response<Vehicle> r = (Response<Vehicle>) client.sendObject(new Request<>(CommandType.REMOVE_HEAD, null));
-            ioManager.write(r.getBody().toString());
+            Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_HEAD, null));
+            if(r.getBody()!=null){
+                Vehicle v = (Vehicle) r.getBody();
+                ioManager.write(v.toString());
+            }else{
+                ioManager.write("No elements in the collection");
+            }
             return r.getResultCode();
         } catch (IOException e) {
             return ResultCode.INTERNAL_CLI_ERROR;

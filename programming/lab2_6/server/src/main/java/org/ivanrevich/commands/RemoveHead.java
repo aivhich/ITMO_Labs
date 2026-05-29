@@ -3,6 +3,7 @@ package org.ivanrevich.commands;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
@@ -35,14 +36,19 @@ public class RemoveHead implements Command{
         QueueManager queueManager = managersLocator.get(QueueManager.class);
         //IOManager ioManager = managersLocator.get(IOManager.class);
         //ioManager.write(queueManager.remove_head().toString());
-        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head().toString());
+        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head());
     }
 
     @Override
     public Result<?> run(String[] args) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
         IOManager ioManager = managersLocator.get(IOManager.class);
-        ioManager.write(queueManager.remove_head().toString());
-        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head().toString());
+        Vehicle v = queueManager.remove_head();
+        if(v!=null){
+            ioManager.write(v.toString());
+        }else{
+            ioManager.write("Collections is empty, there are nothing to remove");
+        }
+        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head());
     }
 }

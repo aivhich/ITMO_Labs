@@ -13,6 +13,8 @@ import org.ivanrevich.utils.ResultCode;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.PriorityQueue;
 
 /**
  * Команда обновления элемента по идентификатору.
@@ -41,17 +43,19 @@ public class Update implements Command{
 
         try {
             int id = Integer.parseInt(args[0]);
-            List<Vehicle> vehicles = (List<Vehicle>) client.sendObject(new Request<>(CommandType.SHOW, null)).getBody();
-            Vehicle old = vehicles.stream().filter(vehicle -> vehicle.getId()==id).findFirst().get();
-
+            PriorityQueue<Vehicle> vehicles = (PriorityQueue<Vehicle>) client.sendObject(new Request<>(CommandType.SHOW, null)).getBody();
+            Optional<Vehicle> old = vehicles.stream().filter(vehicle -> vehicle.getId()==id).findFirst();
+            if(old.isEmpty()){
+                return ResultCode.ID_ISN_EXIST;
+            }
 
             ioManager.write(String.format("--- Updating element with id=%s ---", args[0]));
-            ioManager.write(old.toString());
+            ioManager.write(old.get().toString());
 
-            Vehicle newveh =  (new VehicleFactory(ioManager)).updateVehicle(old);
+            Vehicle newveh =  (new VehicleFactory(ioManager)).updateVehicle(old.get());
             Response<?> r = client.sendObject(new Request<>(CommandType.UPDATE, newveh));
 
-            ioManager.write("Successfully updated vehicle name: " + newveh.getId());
+            ioManager.write("Request to updated vehicle name has been sent: " + newveh.getId());
             return r.getResultCode();
         } catch (NumberFormatException e) {
             return ResultCode.INVALID_ARGS;

@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="lab2_6.server:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lab2_6_server_jar</output-path>
+    <root id="archive" name="lab2_6.server.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/server/src/test/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

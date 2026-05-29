@@ -57,6 +57,7 @@ public class Server {
                         System.exit(0);
                     }
                     try {
+                        ///  Сделать покрасивше
                         switch (ResultCode.fromMessage(e.getMessage())) {
                             case COMMAND_CANCELLED, COMMAND_SOFT_CANCELLED -> {
                                 if (isRawMode) {

@@ -1,0 +1,419 @@
+@startuml lab2_6
+scale 0.7
+skinparam dpi 150
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam packageFontSize 12
+skinparam linetype ortho
+
+' ─────────────────────────────────────
+' COMMON
+' ─────────────────────────────────────
+
+package "common.models" {
+
+    class Vehicle implements Comparable {
+        - id : int
+        - name : String
+        - coordinates : Coordinates
+        - creationDate : Date
+        - enginePower : Float
+        - numberOfWheels : long
+        - type : VehicleType
+        - fuelType : FuelType
+        + compareTo(other : Vehicle) : int
+        + toCsvString() : String
+    }
+
+    class Coordinates {
+        - x : Double
+        - y : Float
+    }
+
+    enum VehicleType {
+        HELICOPTER
+        MOTORCYCLE
+        CHOPPER
+        HOVERBOARD
+    }
+
+    enum FuelType {
+        KEROSENE
+        MANPOWER
+        NUCLEAR
+        PLASMA
+        ANTIMATTER
+    }
+
+    Vehicle --> Coordinates
+    Vehicle --> VehicleType
+    Vehicle --> FuelType
+}
+
+package "common.requests" {
+
+    class Request<T> {
+        - commandType : CommandType
+        - args : T
+    }
+
+    enum CommandType {
+        ADD
+        CLEAR
+        SHOW
+        UPDATE
+        REMOVE_BY_ID
+        REMOVE_HEAD
+        REMOVE_LOWER
+        PRINT_ASCENDING
+        PRINT_UNIQUE_FUEL_TYPE
+        COUNT_GREATER_THAN_FUEL_TYPE
+        INFO
+        HISTORY
+        HELP
+        SAVE
+        EXECUTE
+        EXIT
+    }
+
+    Request --> CommandType
+}
+
+package "common.responses" {
+
+    class Response<T> {
+        - resultCode : ResultCode
+        - message : String
+        - body : T
+    }
+
+    class Result<T> {
+        - resultCode : ResultCode
+        - message : String
+        - output : T
+    }
+
+    enum ResultCode {
+        SUCCESS
+        FAIL_0
+        INVALID_INPUT
+        INVALID_ARGS
+        INVALID_NUM_OF_ARGS
+        ID_ISN_EXIST
+        INTERNAL_SERVER_ERROR
+        INTERNAL_CLI_ERROR
+        INVALID_REQUEST
+        COMMAND_NOT_FOUND
+        COMMAND_CANCELLED
+        SCRIPT_END
+        SCRIPT_ERROR
+        FILE_NOT_FOUND
+    }
+
+    Response --> ResultCode
+    Result --> ResultCode
+}
+
+package "common.utils" {
+
+    class ManagersLocator {
+        - services : Map<Class<?>, Object>
+        + register(type : Class<T>, instance : T) : void
+        + get(type : Class<T>) : T
+    }
+
+    class GenericBuilder<T> {
+        - supplier : Supplier<T>
+        + {static} of(supplier : Supplier<T>) : GenericBuilder<T>
+        + with(consumer : BiConsumer<T,P>, value : P) : GenericBuilder<T>
+        + build() : T
+    }
+
+    class Serializer {
+        + serialize(object : Object) : ByteBuffer
+    }
+
+    class Deserializer<T> {
+        + deserialize(data : byte[]) : T
+    }
+
+    class Fragment {
+        - chunks : List<ByteBuffer>
+        - size : int
+        + send() : ByteBuffer
+        + getChunksCount() : int
+    }
+
+    class FragmentInfo {
+        - size : int
+        - chunksCount : int
+        - chunksSize : int
+    }
+
+    class CommandObj <<record>> {
+        + name : String
+        + args : String[]
+    }
+}
+
+package "common.validators" {
+
+    interface ValidateManager {
+        + checkNumValue(...) : boolean
+        + checkStringValue(...) : boolean
+    }
+
+    class ValidateManagerImpl implements ValidateManager
+
+    class VehicleValidate {
+        + apply(vehicle : Vehicle) : boolean
+    }
+
+    class CoordinatesValidate {
+        + apply(coordinates : Coordinates) : boolean
+    }
+
+    VehicleValidate --> ValidateManagerImpl
+    CoordinatesValidate --> ValidateManagerImpl
+}
+
+' ─────────────────────────────────────
+' SERVER
+' ─────────────────────────────────────
+
+package "server.commands" {
+
+    interface Command {
+        + run(request : Request<?>) : Result<?>
+    }
+
+    class Add implements Command
+    class Clear implements Command
+    class Show implements Command
+    class Update implements Command
+    class RemoveById implements Command
+    class RemoveHead implements Command
+    class RemoveLower implements Command
+    class PrintAscending implements Command
+    class PrintUniqueFuelType implements Command
+    class CountGreaterThanFuelType implements Command
+    class Info implements Command
+    class Help implements Command
+    class History implements Command
+    class Save implements Command
+    class ExecuteScript implements Command
+    class Exit implements Command
+}
+
+package "server.managers" {
+
+    interface Manager
+
+    interface QueueManager extends Manager {
+        + add(vehicle : Vehicle) : void
+        + remove_head() : Vehicle
+        + remove_by_id(id : int) : void
+        + getAll() : PriorityQueue<Vehicle>
+        + clear() : void
+        + updateById(id : int, v : Vehicle) : void
+        + isExistWithId(id : int) : Boolean
+        + getById(id : int) : Vehicle
+        + generateId() : int
+        + size() : int
+        + set(vehicles : List<Vehicle>) : void
+    }
+
+    interface StorageManager extends Manager {
+        + save(queue : ArrayList<Vehicle>, path : String) : void
+        + load(path : String) : List<Vehicle>
+    }
+
+    interface CommandManager {
+        + run(request : Request<?>) : Result<?>
+        + registerCommands(commands : Map<String,Command>) : void
+        + getHistory() : ArrayList<CommandObj>
+        + getRegistedCommands() : Collection<Command>
+        + {static} parseCommand(cmd : String) : CommandObj
+    }
+
+    class QueueManagerImpl implements QueueManager {
+        - priorityQueue : PriorityQueue<Vehicle>
+        - initDate : Instant
+    }
+
+    class StorageManagerImpl implements StorageManager
+
+    class CommandManagerImpl implements CommandManager {
+        - availableCommands : HashMap<String, Command>
+        - history : ArrayList<CommandObj>
+    }
+
+    CommandManagerImpl o-- Command
+    CommandManagerImpl --> CommandObj
+}
+
+package "server.network" {
+
+    class Server {
+        - channel : DatagramChannel
+        - selector : Selector
+        - running : boolean
+        + run() : void
+        + stop() : void
+    }
+
+    class RequestHandler {
+        + {static} apply(key : SelectionKey) : ReadResult
+    }
+
+    class ResponseHandler {
+        + {static} apply(key : SelectionKey, result : Result<?>, addr : InetSocketAddress) : void
+    }
+
+    class ReadResult <<record>> {
+        + request : Request<?>
+        + senderAddress : InetSocketAddress
+    }
+
+    Server --> RequestHandler
+    Server --> ResponseHandler
+    Server --> CommandManager
+    RequestHandler --> ReadResult
+    RequestHandler --> Deserializer
+    ResponseHandler --> Serializer
+    ResponseHandler --> Fragment
+    ResponseHandler --> FragmentInfo
+}
+
+class MainServer {
+    + {static} main(args : String[]) : void
+}
+
+MainServer --> Server
+MainServer --> ManagersLocator
+MainServer --> QueueManagerImpl
+MainServer --> StorageManagerImpl
+MainServer --> CommandManagerImpl
+
+' ─────────────────────────────────────
+' CLIENT
+' ─────────────────────────────────────
+
+package "client.commands" {
+
+    interface ClientCommand {
+        + run(args : String[]) : ResultCode
+    }
+
+    class ClientAdd implements ClientCommand
+    class ClientClear implements ClientCommand
+    class ClientShow implements ClientCommand
+    class ClientUpdate implements ClientCommand
+    class ClientRemoveById implements ClientCommand
+    class ClientRemoveHead implements ClientCommand
+    class ClientRemoveLower implements ClientCommand
+    class ClientPrintAscending implements ClientCommand
+    class ClientPrintUniqueFuelType implements ClientCommand
+    class ClientCountGreater implements ClientCommand
+    class ClientInfo implements ClientCommand
+    class ClientHelp implements ClientCommand
+    class ClientHistory implements ClientCommand
+    class ClientExecuteScript implements ClientCommand
+    class ClientExit implements ClientCommand
+}
+
+package "client.manager" {
+
+    interface IOManager {
+        + read() : String
+        + write(text : String) : void
+        + askString(text : String) : String
+        + askInt(text : String) : Integer
+        + askFloat(text : String) : Float
+        + askDouble(text : String) : Double
+        + askLong(text : String) : Long
+        + askValue(initValue : T, input : Supplier<T>, validator : Predicate<T>) : T
+        + getFile() : String
+    }
+
+    interface ClientCommandManager {
+        + run(cmd : String) : void
+        + registerCommands(commands : Map<String, ClientCommand>) : void
+        + getHistory() : ArrayList<CommandObj>
+    }
+
+    class IOManagerImpl implements IOManager {
+        - isRawMode : boolean
+    }
+
+    class FileIOManagerImpl implements IOManager {
+        - path : String
+        - reader : BufferedReader
+    }
+
+    class IOManagerStack {
+        - stack : Deque<IOManager>
+        + current() : IOManager
+        + push(io : IOManager) : void
+        + pop() : void
+    }
+
+    class ClientCommandManagerImpl implements ClientCommandManager {
+        - availableCommands : HashMap<String, ClientCommand>
+        - history : ArrayList<CommandObj>
+    }
+
+    IOManagerStack o-- IOManager
+    ClientCommandManagerImpl o-- ClientCommand
+}
+
+package "client.factory" {
+
+    class VehicleFactory {
+        - ioManager : IOManager
+        + createVehicle() : Vehicle
+        + updateVehicle(old : Vehicle) : Vehicle
+        + createVehicleForRef() : Vehicle
+    }
+
+    class CoordinatesFactory {
+        - ioManager : IOManager
+        + createCoordinates() : Coordinates
+        + updateCoordinates(old : Coordinates) : Coordinates
+    }
+
+    VehicleFactory --> CoordinatesFactory
+    VehicleFactory --> GenericBuilder
+    CoordinatesFactory --> GenericBuilder
+}
+
+package "client.network" {
+
+    class Client {
+        - socket : DatagramSocket
+        - remoteServer : SocketAddress
+        + sendObject(request : Request<?>) : Response<?>
+    }
+
+    Client --> Serializer
+    Client --> Deserializer
+    Client --> Fragment
+    Client --> FragmentInfo
+}
+
+class ClientMain {
+    + {static} main(args : String[]) : void
+}
+
+ClientMain --> Client
+ClientMain --> ManagersLocator
+ClientMain --> ClientCommandManagerImpl
+ClientMain --> IOManagerImpl
+ClientMain --> IOManagerStack
+
+ClientAdd --> Client
+ClientAdd --> VehicleFactory
+ClientUpdate --> VehicleFactory
+
+@enduml

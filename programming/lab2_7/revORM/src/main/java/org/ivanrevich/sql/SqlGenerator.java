@@ -21,7 +21,7 @@ public class SqlGenerator {
         columns.setLength(columns.length()-1);
         values.setLength(values.length()-1);
         return String.format("" +
-                "INSERT INRO %s (%s) VALUES (%s) RETURNING %s",
+                "INSERT INЕO %s (%s) VALUES (%s) RETURNING %s",
                 metadata.getTableName(),
                 columns,
                 values,

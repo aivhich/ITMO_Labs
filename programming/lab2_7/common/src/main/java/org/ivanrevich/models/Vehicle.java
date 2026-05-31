@@ -1,5 +1,7 @@
 package org.ivanrevich.models;
 
+import org.ivanrevich.annotations.*;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
@@ -21,14 +23,36 @@ import java.util.Objects;
  * @see FuelType
  * @see Comparable
  */
+@Entity
+@Table(name = "vehicles")
 public class Vehicle implements Comparable<Vehicle>, Serializable {
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+
+    @Column(name="name")
     private String name; //Поле не может быть null, Строка не может быть пустой
+
+    @Embedded(overrides = {
+            @AttributeOverride(field = "x", column = "coord_x"),
+            @AttributeOverride(field = "y", column = "coord_y")
+    })
     private Coordinates coordinates; //Поле не может быть null
+
+    @Column(name="creationDate")
     private Date creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+
+    @Column(name="enginePower")
     private Float enginePower; //Поле не может быть null, Значение поля должно быть больше 0
+
+    @Column(name="numberOfWheels")
     private long numberOfWheels; //Значение поля должно быть больше 0
+
+    @Column(name="type")
     private VehicleType type; //Поле не может быть null
+
+    @Column(name="fuelType")
     private FuelType fuelType; //Поле не может быть null
 
 

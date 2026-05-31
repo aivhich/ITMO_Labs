@@ -25,6 +25,8 @@ tasks.jar {
 
 dependencies {
     implementation(project(":common"))
+
+    implementation(project(":revORM"))
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))

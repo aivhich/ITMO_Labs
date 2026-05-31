@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface GeneratedValue {
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface AttributeOverride {
+    String field();
+    String column();
 }

@@ -1,6 +1,8 @@
 package org.ivanrevich.models;
 
 
+import org.ivanrevich.annotations.Column;
+
 import java.io.Serializable;
 
 /**
@@ -13,8 +15,11 @@ import java.io.Serializable;
  * @author Ivan Prokhorevich
  * @version 1.0
  */
+
 public class Coordinates implements Serializable {
+    @Column(name="coord_x")
     private Double x; //Значение поля должно быть больше -371, Поле не может быть null
+    @Column(name="coord_y")
     private Float y; //Максимальное значение поля: 376, Поле не может быть null
 
     public Double getX() {

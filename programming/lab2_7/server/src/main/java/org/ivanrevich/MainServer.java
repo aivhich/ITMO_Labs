@@ -28,12 +28,17 @@ public class MainServer {
 
         logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
 
-        QueueManager queueManager = new QueueManagerImpl();
+        //QueueManager queueManager = new QueueManagerImpl();
+        QueueManager queueManager = new PsqlQueueManagerImpl();
+
         TerminalConfigurator terminalConfigurator = new TerminalConfigurator();
         boolean isRawMode = TerminalConfigurator.enableRawMode();
+
         IOManager ioManager = new IOManagerImpl(isRawMode);
         IOManagerStack ioManagerStack = new IOManagerStack(ioManager);
-        StorageManager storageManager = new StorageManagerImpl(path, queueManager);
+
+        //StorageManager storageManager = new StorageManagerImpl(path, queueManager);
+        StorageManager storageManager = new PsqlStorageManagerImpl();
 
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(IOManager.class, ioManager);

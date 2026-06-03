@@ -19,10 +19,37 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
     private final SqlGenerator sqlGenerator = new SqlGenerator();
     private final ReflectionMapper mapper = new ReflectionMapper();
 
-    public ReflectionCrudRepository(DataSource dataSource, Class<T> clazz, Class<ID> idClass) {
+    public ReflectionCrudRepository(DataSource dataSource, Class<T> clazz) {
         this.dataSource = dataSource;
         this.clazz = clazz;
         this.metadata = new MetadataExtractor().extract(clazz);
+        initTable();
+    }
+
+    @Override
+    public Optional<T> findByField(String columnName, Object value) {
+        String sql = String.format("SELECT * FROM %s WHERE %s = ?", metadata.getTableName(), columnName);
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setObject(1, value);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return Optional.of(mapper.mapRow(rs, clazz, metadata));
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            throw new OrmException("findByField() failed", e);
+        }
+    }
+
+    @Override
+    public void initTable() {
+        String sql = sqlGenerator.buildCreateTable(metadata);
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement()) {
+            st.execute(sql);
+        } catch (SQLException e) {
+            throw new OrmException("initTable() failed for " + clazz.getSimpleName(), e);
+        }
     }
 
     @Override

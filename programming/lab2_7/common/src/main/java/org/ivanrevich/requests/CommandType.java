@@ -16,7 +16,9 @@ public enum CommandType {
     REMOVE_LOWER("remove_lower"),
     SAVE("save"),
     SHOW("show"),
-    UPDATE("update");
+    UPDATE("update"),
+
+    SIGNUP("signup");
 
     private final String name;
 

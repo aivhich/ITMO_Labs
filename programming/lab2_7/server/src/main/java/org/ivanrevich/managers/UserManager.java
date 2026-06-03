@@ -1,12 +1,12 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.auth.Credentials;
-import org.ivanrevich.models.User;
+import org.ivanrevich.auth.User;
 
 public interface UserManager {
     User signup(Credentials credentials);
     //void login(Credentials credentials);
     //void logout(Credentials credentials);
-    void changePassword(Credentials old, Credentials newCredentials);
-    User verify(Credentials credentials);
+    void changePassword(Credentials old, String newPassword);
+    boolean verify(Credentials credentials);
 }

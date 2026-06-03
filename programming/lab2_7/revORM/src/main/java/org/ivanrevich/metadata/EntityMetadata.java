@@ -18,7 +18,5 @@ public class EntityMetadata {
     public ColumnMetadata getIdColumn(){
         return idColumn;
     }
-    public List<ColumnMetadata> getColumns() {
-        return columns;
-    }
+    public List<ColumnMetadata> getColumns() {return columns;}
 }

@@ -7,23 +7,29 @@ public class ColumnMetadata {
     private final String columnName;
     private final boolean id;
     private final boolean generated;
-
+    private final boolean unique;
     private final Field parentField;
 
-    public ColumnMetadata(Field field, String columnName, boolean id, boolean generated) {
+    public ColumnMetadata(Field field, String columnName, boolean id, boolean generated, boolean unique) {
         this.field = field;
         this.columnName = columnName;
         this.id = id;
         this.generated = generated;
         this.parentField = null;
+        this.unique=unique;
     }
 
-    public ColumnMetadata(Field parentField, Field field, String columnName, boolean id, boolean generated) {
+    public ColumnMetadata(Field parentField, Field field, String columnName, boolean id, boolean generated, boolean unique) {
         this.parentField = parentField;
         this.field = field;
         this.columnName = columnName;
         this.id = id;
         this.generated = generated;
+        this.unique = unique;
+    }
+
+    public boolean isUnique() {
+        return unique;
     }
 
     public boolean isEmbedded() {

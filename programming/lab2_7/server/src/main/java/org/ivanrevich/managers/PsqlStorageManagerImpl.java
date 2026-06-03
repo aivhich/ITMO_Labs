@@ -14,7 +14,7 @@ public class PsqlStorageManagerImpl implements StorageManager{
 
     public PsqlStorageManagerImpl(DataSource dataSource) {
         this.entityManager = new EntityManager(dataSource);
-        this.entityManager.register(Vehicle.class, Integer.class);
+        this.entityManager.register(Vehicle.class);
     }
 
     @Override

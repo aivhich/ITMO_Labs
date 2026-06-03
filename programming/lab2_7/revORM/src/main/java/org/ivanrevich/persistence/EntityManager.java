@@ -19,8 +19,8 @@ public class EntityManager {
         this.dataSource = dataSource;
     }
 
-    public <T, ID> void register(Class<T> clazz, Class<ID> idClass) {
-        repos.put(clazz, new ReflectionCrudRepository<>(dataSource, clazz, idClass));
+    public <T, ID> void register(Class<T> clazz) {
+        repos.put(clazz, new ReflectionCrudRepository<>(dataSource, clazz));
     }
 
     @SuppressWarnings("unchecked")
@@ -57,10 +57,12 @@ public class EntityManager {
     private ReflectionCrudRepository repoFor(Class<?> clazz) {
         ReflectionCrudRepository repo = repos.get(clazz);
         if (repo == null) {
-            throw new IllegalStateException(
-                    "No repository registered for " + clazz.getName()
-                            + ". Call em.register() first.");
+            throw new IllegalStateException("No repository registered for " + clazz.getName() + ". Call em.register() first.");
         }
         return repo;
+    }
+
+    public <T> Optional<T> findByField(Class<T> clazz, String columnName, Object value) {
+        return repoFor(clazz).findByField(columnName, value);
     }
 }

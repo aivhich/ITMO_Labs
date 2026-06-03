@@ -48,7 +48,8 @@ public class MetadataExtractor {
                     boolean isId = innerField.isAnnotationPresent(Id.class);
                     boolean isGenerated = innerField.isAnnotationPresent(GeneratedValue.class);
 
-                    ColumnMetadata meta = new ColumnMetadata(field, innerField, columnName, isId, isGenerated);
+                    boolean isUnique = field.isAnnotationPresent(Unique.class);
+                    ColumnMetadata meta = new ColumnMetadata(field, innerField, columnName, isId, isGenerated, isUnique);
                     columns.add(meta);
 
                     if (isId) {
@@ -65,7 +66,9 @@ public class MetadataExtractor {
             boolean isId = field.isAnnotationPresent(Id.class);
             boolean isGenerated = field.isAnnotationPresent(GeneratedValue.class);
 
-            ColumnMetadata meta = new ColumnMetadata(field, column.name(), isId, isGenerated);
+
+            boolean isUnique = field.isAnnotationPresent(Unique.class);
+            ColumnMetadata meta = new ColumnMetadata(field, column.name(), isId, isGenerated, isUnique);
             columns.add(meta);
 
             if (isId) {

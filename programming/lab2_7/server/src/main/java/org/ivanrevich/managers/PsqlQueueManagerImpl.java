@@ -15,7 +15,7 @@ public class PsqlQueueManagerImpl implements QueueManager{
 
     public PsqlQueueManagerImpl(DataSource dataSource) {
         this.entityManager = new EntityManager(dataSource);
-        this.entityManager.register(Vehicle.class, Integer.class);
+        this.entityManager.register(Vehicle.class);
 
         List<Vehicle> all = entityManager.findAll(Vehicle.class);
         inMemoryPriorityQueue.addAll(all);

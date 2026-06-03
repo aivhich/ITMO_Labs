@@ -1,6 +1,8 @@
 package org.ivanrevich;
 
+import org.ivanrevich.auth.User;
 import org.ivanrevich.commands.*;
+import org.ivanrevich.config.AppConfig;
 import org.ivanrevich.config.DataSourceConfig;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Server;
@@ -17,9 +19,9 @@ import java.util.logging.Logger;
 
 public class MainServer {
     private static final Logger logger = Logger.getLogger(MainServer.class.getName());
-    private static final String dbUrl = System.getenv().getOrDefault("DB_URL",  "jdbc:postgresql://localhost:5432/proglab7");
-    private static final String dbUser = System.getenv().getOrDefault("DB_USER", "postgres");
-    private static final String dbPassword = System.getenv().getOrDefault("DB_PASS", "postgres");
+    private static final String dbUrl = AppConfig.getConfig("db.url","jdbc:postgresql://localhost:5432/proglab7");
+    private static final String dbUser = AppConfig.getConfig("db.user","postgres");
+    private static final String dbPassword = AppConfig.getConfig("db.password","postgres");
 
     public static void main(String[] args) throws Exception {
         AtomicBoolean collectionWasSaved = new AtomicBoolean(false);
@@ -34,6 +36,8 @@ public class MainServer {
         logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
 
         DataSource dataSource = DataSourceConfig.create(dbUrl, dbUser, dbPassword);
+        UserManager userManager = new UserManagerImpl(dataSource);
+
         //QueueManager queueManager = new QueueManagerImpl();
         QueueManager queueManager = new PsqlQueueManagerImpl(dataSource);
         //StorageManager storageManager = new StorageManagerImpl(path, queueManager);
@@ -47,6 +51,7 @@ public class MainServer {
 
 
         ManagersLocator managersLocator = new ManagersLocator();
+        managersLocator.register(UserManager.class, userManager);
         managersLocator.register(IOManager.class, ioManager);
         managersLocator.register(IOManagerStack.class, ioManagerStack);
         managersLocator.register(StorageManager.class, storageManager);

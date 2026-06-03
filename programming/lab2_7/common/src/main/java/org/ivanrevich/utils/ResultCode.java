@@ -42,7 +42,9 @@ public enum ResultCode {
     // Сеть
     INTERNAL_CLI_ERROR("Internal client error"),
     INVALID_REQUEST("Invalid request"),
-    INTERNAL_SERVER_ERROR("Internal server error");
+    INTERNAL_SERVER_ERROR("Internal server error"),
+
+    UNAUTHORIZED_REQUEST("User is not authorized");
 
     private final String message;
 

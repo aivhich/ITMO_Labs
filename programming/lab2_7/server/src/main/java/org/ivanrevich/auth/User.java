@@ -1,5 +1,4 @@
-package org.ivanrevich.models;
-
+package org.ivanrevich.auth;
 
 import org.ivanrevich.annotations.*;
 
@@ -13,17 +12,22 @@ public class User implements Serializable {
     @Column(name="id")
     private int id;
 
-    @Unique
     @Column(name = "username")
+    @Unique
     private String username;
     @Column(name = "password")
-    private String password;
+    private byte[] password;
+    @Column(name="salt")
+    private String salt;
 
 
     public User(String username, String password) {
         this.username = username;
-        this.password = password;
+        this.salt = SaltGenerator.generateSalt();
+        this.password = PasswordService.getHash(password, salt);
     }
+
+
 
     public int getId() {
         return id;
@@ -41,11 +45,16 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public boolean isPasswordEqual(String outerPassword) {
+        return (PasswordService.getHash(outerPassword, salt).equals(password));
+    }
+
+    public void updatePassword(String newPassword) {
+        this.salt = SaltGenerator.generateSalt();
+        this.password = PasswordService.getHash(newPassword, salt);
     }
 }

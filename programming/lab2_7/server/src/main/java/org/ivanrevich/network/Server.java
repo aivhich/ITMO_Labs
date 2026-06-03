@@ -1,9 +1,12 @@
 package org.ivanrevich.network;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.auth.User;
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.IOManagerStack;
+import org.ivanrevich.managers.UserManager;
+import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
@@ -38,6 +41,7 @@ public class Server {
 
     public void run() throws Exception {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
+        UserManager userManager = managersLocator.get(UserManager.class);
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
@@ -116,36 +120,55 @@ public class Server {
                         Request<?> request = readResult.request();
                         sender = readResult.senderAddress();
 
-                        logger.log(Level.INFO, "Получен запрос от " + sender
-                                + " | команда: " + request.getCommandType());
+                        /// CREATE USER
+                        if(request.getCommandType() == CommandType.SIGNUP){
+                            User user = userManager.signup(request.getCredentials());
+                            logger.log(Level.INFO, "Зарегистрирован новый пользователь "+user.getUsername());
+                            ResponseHandler.apply(key,
+                                    new Result<>(
+                                            ResultCode.SUCCESS,
+                                            "Successfully signed up",
+                                            user
+                                    ),
+                                    sender
+                            );
+                            continue;
+                        }
+
+                        /// BLOCK UNAUTHORIZED REQUEST
+                        if(!userManager.verify(request.getCredentials())){
+                            logger.log(Level.INFO, "Запрос от незарегистрировано пользователя");
+                            ResponseHandler.apply(key,
+                                    new Result<>(
+                                            ResultCode.UNAUTHORIZED_REQUEST,
+                                            "UNAUTHORIZED_REQUEST",
+                                            "UNAUTHORIZED_REQUEST"
+                                    ),
+                                    sender
+                            );
+                            continue;
+                        }
+
+
+                        logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
 
                         try {
                             Result<?> result = commandManager.run(request);
-
-                            logger.log(Level.INFO, "Команда " + request.getCommandType()
-                                    + " выполнена | статус: " + result.getResultCode()
-                                    + " | клиент: " + sender);
-
+                            logger.log(Level.INFO, "Команда " + request.getCommandType() + " выполнена | статус: " + result.getResultCode() + " | клиент: " + sender);
                             ResponseHandler.apply(key, result, sender);
-
                             logger.log(Level.INFO, "Ответ отправлен клиенту " + sender);
 
                         } catch (Exception e) {
-                            logger.log(Level.WARNING, "Ошибка при обработке команды "
-                                    + request.getCommandType() + ": " + e.getMessage(), e);
+                            logger.log(Level.WARNING, "Ошибка при обработке команды " + request.getCommandType() + ": " + e.getMessage(), e);
                             if (sender != null) {
                                 try {
                                     ResponseHandler.apply(key,
-                                            new Result<>(
-                                                    ResultCode.INTERNAL_SERVER_ERROR,
-                                                    e.getMessage(),
-                                                    e.getCause()),
+                                            new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause()),
                                             sender
                                     );
                                     logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + sender);
                                 } catch (IOException sendEx) {
-                                    logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту "
-                                            + sender + ": " + sendEx.getMessage());
+                                    logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту " + sender + ": " + sendEx.getMessage());
                                 }
                             }
                         }

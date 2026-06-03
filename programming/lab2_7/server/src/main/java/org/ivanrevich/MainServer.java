@@ -1,12 +1,14 @@
 package org.ivanrevich;
 
 import org.ivanrevich.commands.*;
+import org.ivanrevich.config.DataSourceConfig;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Server;
 import org.ivanrevich.requests.CommandType;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.utils.TerminalConfigurator;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,6 +17,9 @@ import java.util.logging.Logger;
 
 public class MainServer {
     private static final Logger logger = Logger.getLogger(MainServer.class.getName());
+    private static final String dbUrl = System.getenv().getOrDefault("DB_URL",  "jdbc:postgresql://localhost:5432/proglab7");
+    private static final String dbUser = System.getenv().getOrDefault("DB_USER", "postgres");
+    private static final String dbPassword = System.getenv().getOrDefault("DB_PASS", "postgres");
 
     public static void main(String[] args) throws Exception {
         AtomicBoolean collectionWasSaved = new AtomicBoolean(false);
@@ -28,8 +33,11 @@ public class MainServer {
 
         logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
 
+        DataSource dataSource = DataSourceConfig.create(dbUrl, dbUser, dbPassword);
         //QueueManager queueManager = new QueueManagerImpl();
-        QueueManager queueManager = new PsqlQueueManagerImpl();
+        QueueManager queueManager = new PsqlQueueManagerImpl(dataSource);
+        //StorageManager storageManager = new StorageManagerImpl(path, queueManager);
+        StorageManager storageManager = new PsqlStorageManagerImpl(dataSource);
 
         TerminalConfigurator terminalConfigurator = new TerminalConfigurator();
         boolean isRawMode = TerminalConfigurator.enableRawMode();
@@ -37,8 +45,6 @@ public class MainServer {
         IOManager ioManager = new IOManagerImpl(isRawMode);
         IOManagerStack ioManagerStack = new IOManagerStack(ioManager);
 
-        //StorageManager storageManager = new StorageManagerImpl(path, queueManager);
-        StorageManager storageManager = new PsqlStorageManagerImpl();
 
         ManagersLocator managersLocator = new ManagersLocator();
         managersLocator.register(IOManager.class, ioManager);

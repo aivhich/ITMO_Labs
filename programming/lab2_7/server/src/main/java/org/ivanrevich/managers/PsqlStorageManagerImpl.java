@@ -1,30 +1,35 @@
 package org.ivanrevich.managers;
 
 import org.ivanrevich.models.Vehicle;
-import org.ivanrevich.repository.ReflectionCrudRepository;
+import org.ivanrevich.persistence.EntityManager;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// ЗАГЛУШКА
 public class PsqlStorageManagerImpl implements StorageManager{
-//    String url = "jdbc:postgresql://localhost:5432/ivanrevich";
-//    String user = "ivanrevich";
-//    String password = "ivanrevich"; // TODO THAT's fucking shit, move it to configs file
-    ReflectionCrudRepository<Vehicle, Integer> repository;
+    private final EntityManager entityManager;
+
+    public PsqlStorageManagerImpl(DataSource dataSource) {
+        this.entityManager = new EntityManager(dataSource);
+        this.entityManager.register(Vehicle.class, Integer.class);
+    }
 
     @Override
     public void save(ArrayList<Vehicle> queue, String path) {
-        for(Vehicle vehicle : queue){
-            if(repository.existsById(vehicle.getId())) {
-                repository.update(vehicle);
-            }else {
-                repository.save(vehicle);
+        for (Vehicle vehicle : queue) {
+            if (entityManager.existsById(Vehicle.class, vehicle.getId())) {
+                entityManager.update(vehicle);
+            } else {
+                entityManager.save(vehicle);
             }
         }
     }
 
     @Override
     public List<Vehicle> load(String path) {
-        return repository.findAll();
+        return entityManager.findAll(Vehicle.class);
     }
 }

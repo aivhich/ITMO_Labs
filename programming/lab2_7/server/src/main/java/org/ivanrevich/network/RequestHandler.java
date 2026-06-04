@@ -13,7 +13,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 public class RequestHandler {
-    public static ReadResult apply(SelectionKey key) throws IOException {
+    public static synchronized ReadResult apply(SelectionKey key) throws IOException {
         DatagramChannel dc = (DatagramChannel) key.channel();
 
         ByteBuffer infoBuffer = ByteBuffer.allocate(65536);
@@ -52,8 +52,7 @@ public class RequestHandler {
         }
         try {
             Request<?> r = new Deserializer<Request<?>>().deserialize(fullData.array());
-            return new ReadResult(new Deserializer<Request<?>>()
-                            .deserialize(fullData.array()),
+            return new ReadResult(r,
                     sender
             );
         } catch (ClassNotFoundException e) {

@@ -119,6 +119,8 @@ public class Server {
                     if (!key.isValid()) continue;
 
                     if (key.isReadable()) {
+                        byte[] rawData = RawReader.read(key); /// todo here
+                        if (rawData == null) continue;
                         readPool.submit(() -> handleRequest(key, commandManager));
                     }
                 }

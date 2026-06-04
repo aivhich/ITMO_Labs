@@ -57,6 +57,7 @@ public class AuthManagerImpl implements AuthManager{
                 return true;
             }
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
             return false;
         }
         return false;

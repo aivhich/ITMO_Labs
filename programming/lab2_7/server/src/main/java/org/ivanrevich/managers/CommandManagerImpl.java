@@ -32,7 +32,7 @@ public class CommandManagerImpl implements CommandManager {
     private final HashMap<String, Command> publicCommands = new HashMap<>();
     private final ArrayList<CommandObj> history = new ArrayList<>();
     private ManagersLocator managersLocator;
-    private final Logger logger = Logger.getLogger(Server.class.getName());
+    private final Logger logger = Logger.getLogger(CommandManagerImpl.class.getName());
 
     public CommandManagerImpl(ManagersLocator managersLocator) {
         this.managersLocator=  managersLocator;
@@ -52,7 +52,8 @@ public class CommandManagerImpl implements CommandManager {
 
         if(pubCommand == null) {
             /// BLOCK UNAUTHORIZED REQUEST
-            if(!userManager.verify(r.getCredentials())){
+            if(userManager.verify(r.getCredentials()) == null){
+                System.out.println("cred is null");
                 logger.log(Level.INFO, "Запрос от незарегистрировано пользователя");
                 return new Result<>(ResultCode.UNAUTHORIZED_REQUEST, "You're not authorized to perform this operation.", "You're not authorized to perform this operation.");
             }
@@ -62,6 +63,7 @@ public class CommandManagerImpl implements CommandManager {
             history.add(new CommandObj(commandName, new String[]{}));
             return result;
         }
+        System.out.println("pub command");
         return pubCommand.run(r);
     }
 

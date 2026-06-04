@@ -30,6 +30,7 @@ public class Signup implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
+        logger.log(Level.INFO, "start signup ");
         UserManager userManager = managersLocator.get(UserManager.class);
         /// CREATE USER
         User user = userManager.signup(r.getCredentials());

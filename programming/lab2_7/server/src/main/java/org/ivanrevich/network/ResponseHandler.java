@@ -26,11 +26,13 @@ public class ResponseHandler {
         Fragment fragment = new Fragment(data, 1024);
         FragmentInfo fragmentInfo = new FragmentInfo(fragment.getDataSize(), fragment.getChunksCount(), 1024);
 
-        dc.send(serializer.serialize(fragmentInfo), clientAddress);
-        while(true){
-            ByteBuffer buffer = fragment.send();
-            if(buffer == null) break;
-            dc.send(buffer, clientAddress);
+        synchronized (dc) {
+            dc.send(serializer.serialize(fragmentInfo), clientAddress);
+            while (true) {
+                ByteBuffer buffer = fragment.send();
+                if (buffer == null) break;
+                dc.send(buffer, clientAddress);
+            }
         }
     }
 }

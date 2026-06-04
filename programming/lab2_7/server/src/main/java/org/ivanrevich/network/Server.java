@@ -28,7 +28,11 @@ public class Server {
     private boolean running;
     private boolean isRawMode;
     private final ManagersLocator managersLocator;
-    private final ExecutorService service;
+
+    private final ExecutorService readPool = Executors.newCachedThreadPool();
+    private final ExecutorService handlePool = Executors.newFixedThreadPool(4);
+    private final ExecutorService answerPool = Executors.newFixedThreadPool(4);
+
     private final Logger logger = Logger.getLogger(Server.class.getName());
 
     public Server(int port, ManagersLocator managersLocator) throws Exception {
@@ -39,7 +43,6 @@ public class Server {
         channel.register(selector, SelectionKey.OP_READ);
 
         this.managersLocator = managersLocator;
-        this.service = Executors.newCachedThreadPool();
 
         logger.log(Level.INFO, "Сетевой канал открыт, порт: " + port);
     }
@@ -49,8 +52,7 @@ public class Server {
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
-        service.submit(
-                () -> {
+        Thread consoleThread = new Thread(() -> {
             while (running) {
                 IOManager ioManager = managersLocator.get(IOManager.class);
                 try {
@@ -102,59 +104,81 @@ public class Server {
                 }
             }
         });
-        service.submit(()->{
-            while (running) {
-                try {
-                    selector.select();
-                    Set<SelectionKey> keys = selector.selectedKeys();
+        consoleThread.setDaemon(true);
+        consoleThread.start();
 
-                    for (var iter = keys.iterator(); iter.hasNext(); ) {
-                        SelectionKey key = iter.next();
-                        iter.remove();
+        while (running) {
+            try {
+                selector.select();
+                Set<SelectionKey> keys = selector.selectedKeys();
 
-                        if (!key.isValid()) continue;
+                for (var iter = keys.iterator(); iter.hasNext(); ) {
+                    SelectionKey key = iter.next();
+                    iter.remove();
 
-                        if (key.isReadable()) {
-                            InetSocketAddress sender = null;
+                    if (!key.isValid()) continue;
 
-                            ReadResult readResult = RequestHandler.apply(key);
-                            if (readResult == null) {
-                                logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
-                                continue;
-                            }
-
-                            Request<?> request = readResult.request();
-                            sender = readResult.senderAddress();
-
-
-                            logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
-
-                            try {
-                                Result<?> result = commandManager.run(request);
-                                logger.log(Level.INFO, "Команда " + request.getCommandType() + " выполнена | статус: " + result.getResultCode() + " | клиент: " + sender);
-                                ResponseHandler.apply(key, result, sender);
-                                logger.log(Level.INFO, "Ответ отправлен клиенту " + sender);
-
-                            } catch (Exception e) {
-                                logger.log(Level.WARNING, "Ошибка при обработке команды " + request.getCommandType() + ": " + e.getMessage(), e);
-                                if (sender != null) {
-                                    try {
-                                        ResponseHandler.apply(key,
-                                                new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause()),
-                                                sender
-                                        );
-                                        logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + sender);
-                                    } catch (IOException sendEx) {
-                                        logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту " + sender + ": " + sendEx.getMessage());
-                                    }
-                                }
-                            }
-                        }
+                    if (key.isReadable()) {
+                        readPool.submit(() -> handleRequest(key, commandManager));
                     }
-                } catch (Exception _) {}
-            }
-        });
+                }
+            } catch (Exception _) {}
+        }
         stop();
+    }
+    private void sendResponse(SelectionKey key, Result<?> result, InetSocketAddress clientAddress) {
+        try {
+            ResponseHandler.apply(key, result, clientAddress);
+            logger.log(Level.INFO, "Ответ отправлен клиенту " + clientAddress);
+        }catch (IOException e){
+            if (clientAddress != null) {
+                try {
+                    ResponseHandler.apply(key,
+                            new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause()),
+                            clientAddress
+                    );
+                    logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + clientAddress);
+                } catch (IOException sendEx) {
+                    logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту " + clientAddress + ": " + sendEx.getMessage());
+                }
+            }
+        }
+    }
+
+    private void runRequest(SelectionKey key, Request<?> request,
+                            InetSocketAddress clientAddress,
+                            CommandManager commandManager){
+        try {
+            Result<?> result = commandManager.run(request);
+            logger.log(Level.INFO, "Команда " + request.getCommandType() + " выполнена | статус: " + result.getResultCode() + " | клиент: " + clientAddress);
+            answerPool.submit(() -> {sendResponse(key, result, clientAddress);});
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Ошибка при обработке команды " + request.getCommandType() + ": " + e.getMessage(), e);
+            answerPool.submit(() -> sendResponse(key,
+                    new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), null),
+                    clientAddress));
+        }
+    }
+
+
+
+    private void handleRequest(SelectionKey key, CommandManager commandManager){
+        try{
+            InetSocketAddress sender = null;
+            ReadResult readResult = RequestHandler.apply(key);
+            if (readResult == null) {
+                logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
+                return;
+            }
+
+            Request<?> request = readResult.request();
+            sender = readResult.senderAddress();
+            final InetSocketAddress clientAddress = sender;
+            logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
+            handlePool.submit(() -> runRequest(key, request, clientAddress, commandManager));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Ошибка чтения запроса: " + e.getMessage());
+        }
     }
 
     public void stop() throws IOException {

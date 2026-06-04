@@ -25,24 +25,24 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public void add(Vehicle vehicle) {
+    public synchronized void add(Vehicle vehicle) {
         Vehicle v = entityManager.save(vehicle);
         inMemoryPriorityQueue.add(v);
     }
 
 
     @Override
-    public int size() {
+    public synchronized int size() {
         return inMemoryPriorityQueue.size();
     }
 
     @Override
-    public Boolean isExistWithId(int id) {
+    public synchronized Boolean isExistWithId(int id) {
         return inMemoryPriorityQueue.stream().anyMatch(vehicle -> vehicle.getId() == id);
     }
 
     @Override
-    public Integer getOwnerById(int id) {
+    public synchronized Integer getOwnerById(int id) {
         try {
             return inMemoryPriorityQueue.stream().filter(vehicle -> vehicle.getId() == id).findFirst().orElseThrow().getAuthorId();
         }catch (NoSuchElementException e){
@@ -51,12 +51,12 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public Vehicle getById(int id) {
+    public synchronized Vehicle getById(int id) {
         return inMemoryPriorityQueue.stream().filter(vehicle -> vehicle.getId() == id).findFirst().orElse(null);
     }
 
     @Override
-    public void updateById(int id, Vehicle v) {
+    public synchronized void updateById(int id, Vehicle v) {
         if(entityManager.existsById(Vehicle.class, id)) {
             entityManager.update(v);
             inMemoryPriorityQueue.removeIf(vehicle -> vehicle.getId() == id);
@@ -65,25 +65,25 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public PriorityQueue<Vehicle> getAll() {
+    public synchronized PriorityQueue<Vehicle> getAll() {
         return inMemoryPriorityQueue;
     }
 
     @Override
-    public Vehicle remove_head() {
+    public synchronized Vehicle remove_head() {
         Vehicle v=inMemoryPriorityQueue.poll();
         entityManager.deleteById(Vehicle.class, v.getId());
         return v;
     }
 
     @Override
-    public void remove_by_id(int id) {
+    public synchronized void remove_by_id(int id) {
         entityManager.deleteById(Vehicle.class, id);
         inMemoryPriorityQueue.removeIf(vehicle -> vehicle.getId() == id);
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         for(Vehicle v:entityManager.findAll(Vehicle.class)){
             entityManager.deleteById(Vehicle.class, v.getId());
         }
@@ -91,7 +91,7 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public void clear(Integer byUserId) {
+    public synchronized void clear(Integer byUserId) {
         for(Vehicle v:entityManager.findAll(Vehicle.class)){
             if(Objects.equals(v.getAuthorId(), byUserId)) {
                 entityManager.deleteById(Vehicle.class, v.getId());
@@ -102,7 +102,7 @@ public class PsqlQueueManagerImpl implements QueueManager{
 
     /// ACTUALLY it's doing nothing now
     @Override
-    public int generateId() {
+    public synchronized int generateId() {
         return inMemoryPriorityQueue.stream()
                 .mapToInt(Vehicle::getId)
                 .max()
@@ -110,7 +110,7 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public void set(List<Vehicle> vehicles) {
+    public synchronized void set(List<Vehicle> vehicles) {
         for(Vehicle v:vehicles){
             Vehicle v2 = entityManager.save(v);
             inMemoryPriorityQueue.add(v2);
@@ -118,7 +118,7 @@ public class PsqlQueueManagerImpl implements QueueManager{
     }
 
     @Override
-    public Vehicle getLast() {
+    public synchronized Vehicle getLast() {
         return inMemoryPriorityQueue.peek();
     }
 }

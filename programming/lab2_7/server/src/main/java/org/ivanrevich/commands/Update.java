@@ -5,11 +5,14 @@ import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.factory.VehicleFactory;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.managers.UserManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
 import org.ivanrevich.validators.VehicleValidate;
+
+import java.util.Objects;
 
 /**
  * Команда обновления элемента по идентификатору.
@@ -31,15 +34,19 @@ public class Update implements Command{
 
     @Override
     public Result<?> run(Request<?> r) {
-
         QueueManager queueManager = managersLocator.get(QueueManager.class);
+        UserManager userManager = managersLocator.get(UserManager.class);
         try {
             Vehicle newv = (Vehicle) r.getArgs();
+
             if (!(new VehicleValidate()).apply(newv))
                 return new Result<Vehicle>(ResultCode.INVALID_INPUT, "Exception while update vehicle. Invalid input", newv);
 
             if(!queueManager.isExistWithId(newv.getId())) {
                 return new Result<>(ResultCode.ID_ISN_EXIST, "Fail", "Entity with that id is not exists.");
+            }
+            if(!Objects.equals(newv.getAuthorId(), userManager.getIdForUser(r.getCredentials())) || !Objects.equals(queueManager.getOwnerById(newv.getId()), userManager.getIdForUser(r.getCredentials()))) {
+                return new Result<Vehicle>(ResultCode.HAVENT_OWNER_RULES, "Exception while update vehicle. You haven't owner rules", newv);
             }
             queueManager.updateById(newv.getId(),  newv);
 

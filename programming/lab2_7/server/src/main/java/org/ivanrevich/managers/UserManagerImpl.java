@@ -45,4 +45,9 @@ public class UserManagerImpl implements UserManager{
         }
         return null;
     }
+
+    @Override
+    public Integer getIdForUser(Credentials credentials) {
+        return verify(credentials).getId();
+    }
 }

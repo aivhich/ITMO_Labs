@@ -1,5 +1,6 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.auth.Credentials;
 import org.ivanrevich.models.Vehicle;
 
 import java.time.Instant;
@@ -20,15 +21,17 @@ import java.util.PriorityQueue;
  */
 public interface QueueManager {
     void add(Vehicle vehicle);
-    Instant getInitDate();
+    Vehicle getLast();
     int size();
     Boolean isExistWithId(int id);
+    Integer getOwnerById(int id);
     Vehicle getById(int id);
     void updateById(int id, Vehicle v);
     PriorityQueue<Vehicle> getAll();
     Vehicle remove_head();
     void remove_by_id(int id);
     void clear();
+    void clear(Integer byUserId);
     int generateId();
     void set(List<Vehicle> vehicles);
 }

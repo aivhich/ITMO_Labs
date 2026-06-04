@@ -44,7 +44,8 @@ public enum ResultCode {
     INVALID_REQUEST("Invalid request"),
     INTERNAL_SERVER_ERROR("Internal server error"),
 
-    UNAUTHORIZED_REQUEST("User is not authorized");
+    UNAUTHORIZED_REQUEST("User is not authorized"),
+    HAVENT_OWNER_RULES("You don't have owner rules");
 
     private final String message;
 

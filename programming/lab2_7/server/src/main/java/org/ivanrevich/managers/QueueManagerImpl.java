@@ -1,11 +1,14 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.auth.Credentials;
 import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.utils.ResultCode;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 /**
@@ -16,7 +19,7 @@ import java.util.PriorityQueue;
  */
 public class QueueManagerImpl implements QueueManager {
     private final PriorityQueue<Vehicle> priorityQueue = new PriorityQueue<>();
-    private final Instant initDate = Instant.now();
+//    private final Instant initDate = Instant.now();
 
     @Override
     public void add(Vehicle vehicle) {
@@ -51,6 +54,11 @@ public class QueueManagerImpl implements QueueManager {
     }
 
     @Override
+    public void clear(Integer byUserId) {
+        priorityQueue.removeIf(vehicle -> Objects.equals(vehicle.getAuthorId(), byUserId));
+    }
+
+    @Override
     public int generateId() {
         return priorityQueue.stream()
                 .mapToInt(Vehicle::getId)
@@ -61,6 +69,15 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public Boolean isExistWithId(int id) {
         return priorityQueue.stream().anyMatch(vehicle -> vehicle.getId() == id);
+    }
+
+    @Override
+    public Integer getOwnerById(int id) {
+        try {
+            return priorityQueue.stream().filter(vehicle -> vehicle.getId() == id).findFirst().orElseThrow().getAuthorId();
+        }catch (NoSuchElementException e){
+            return -1;
+        }
     }
 
     @Override
@@ -83,7 +100,7 @@ public class QueueManagerImpl implements QueueManager {
     }
 
     @Override
-    public Instant getInitDate() {
-        return initDate;
+    public Vehicle getLast() {
+        return priorityQueue.peek();
     }
 }

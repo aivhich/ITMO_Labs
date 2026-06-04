@@ -3,10 +3,13 @@ package org.ivanrevich.commands;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.managers.UserManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
+
+import java.util.Objects;
 
 /**
  * Команда удаления и вывода первого элемента коллекции.
@@ -34,9 +37,20 @@ public class RemoveHead implements Command{
     @Override
     public Result<?> run(Request<?> request) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
+        UserManager userManager = managersLocator.get(UserManager.class);
+
+        if(!Objects.equals(
+                queueManager.getOwnerById(queueManager.getLast().getAuthorId()),
+                userManager.getIdForUser(request.getCredentials())
+        )) {
+            return new Result<>(ResultCode.HAVENT_OWNER_RULES,
+                    "Exception while update vehicle. You haven't owner rules",
+                    "Exception while update vehicle. You haven't owner rules");
+        }
+        Vehicle vehicle = queueManager.remove_head();
         //IOManager ioManager = managersLocator.get(IOManager.class);
         //ioManager.write(queueManager.remove_head().toString());
-        return new Result<>(ResultCode.SUCCESS, "Success", queueManager.remove_head());
+        return new Result<>(ResultCode.SUCCESS, "Success", vehicle);
     }
 
     @Override

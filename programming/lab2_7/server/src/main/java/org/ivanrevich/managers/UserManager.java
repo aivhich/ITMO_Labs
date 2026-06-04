@@ -9,4 +9,5 @@ public interface UserManager {
     //void logout(Credentials credentials);
     void changePassword(Credentials old, String newPassword);
     User verify(Credentials credentials);
+    Integer getIdForUser(Credentials credentials);
 }

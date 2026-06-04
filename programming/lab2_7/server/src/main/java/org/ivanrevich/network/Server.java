@@ -17,6 +17,8 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ public class Server {
     private boolean running;
     private boolean isRawMode;
     private final ManagersLocator managersLocator;
+    private final ExecutorService service;
     private final Logger logger = Logger.getLogger(Server.class.getName());
 
     public Server(int port, ManagersLocator managersLocator) throws Exception {
@@ -33,8 +36,10 @@ public class Server {
         channel = DatagramChannel.open();
         channel.bind(new InetSocketAddress(port));
         channel.configureBlocking(false);
-        this.managersLocator = managersLocator;
         channel.register(selector, SelectionKey.OP_READ);
+
+        this.managersLocator = managersLocator;
+        this.service = Executors.newCachedThreadPool();
 
         logger.log(Level.INFO, "Сетевой канал открыт, порт: " + port);
     }
@@ -44,7 +49,8 @@ public class Server {
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
-        new Thread(() -> {
+        service.submit(
+                () -> {
             while (running) {
                 IOManager ioManager = managersLocator.get(IOManager.class);
                 try {
@@ -95,58 +101,59 @@ public class Server {
                     }
                 }
             }
-        }).start();
-        while (running) {
-            try {
-                selector.select();
-                Set<SelectionKey> keys = selector.selectedKeys();
+        });
+        service.submit(()->{
+            while (running) {
+                try {
+                    selector.select();
+                    Set<SelectionKey> keys = selector.selectedKeys();
 
-                for (var iter = keys.iterator(); iter.hasNext(); ) {
-                    SelectionKey key = iter.next();
-                    iter.remove();
+                    for (var iter = keys.iterator(); iter.hasNext(); ) {
+                        SelectionKey key = iter.next();
+                        iter.remove();
 
-                    if (!key.isValid()) continue;
+                        if (!key.isValid()) continue;
 
-                    if (key.isReadable()) {
-                        InetSocketAddress sender = null;
+                        if (key.isReadable()) {
+                            InetSocketAddress sender = null;
 
-                        ReadResult readResult = RequestHandler.apply(key);
-                        if (readResult == null) {
-                            logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
-                            continue;
-                        }
+                            ReadResult readResult = RequestHandler.apply(key);
+                            if (readResult == null) {
+                                logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
+                                continue;
+                            }
 
-                        Request<?> request = readResult.request();
-                        sender = readResult.senderAddress();
+                            Request<?> request = readResult.request();
+                            sender = readResult.senderAddress();
 
 
-                        logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
+                            logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
 
-                        try {
-                            Result<?> result = commandManager.run(request);
-                            logger.log(Level.INFO, "Команда " + request.getCommandType() + " выполнена | статус: " + result.getResultCode() + " | клиент: " + sender);
-                            ResponseHandler.apply(key, result, sender);
-                            logger.log(Level.INFO, "Ответ отправлен клиенту " + sender);
+                            try {
+                                Result<?> result = commandManager.run(request);
+                                logger.log(Level.INFO, "Команда " + request.getCommandType() + " выполнена | статус: " + result.getResultCode() + " | клиент: " + sender);
+                                ResponseHandler.apply(key, result, sender);
+                                logger.log(Level.INFO, "Ответ отправлен клиенту " + sender);
 
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Ошибка при обработке команды " + request.getCommandType() + ": " + e.getMessage(), e);
-                            if (sender != null) {
-                                try {
-                                    ResponseHandler.apply(key,
-                                            new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause()),
-                                            sender
-                                    );
-                                    logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + sender);
-                                } catch (IOException sendEx) {
-                                    logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту " + sender + ": " + sendEx.getMessage());
+                            } catch (Exception e) {
+                                logger.log(Level.WARNING, "Ошибка при обработке команды " + request.getCommandType() + ": " + e.getMessage(), e);
+                                if (sender != null) {
+                                    try {
+                                        ResponseHandler.apply(key,
+                                                new Result<>(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage(), e.getCause()),
+                                                sender
+                                        );
+                                        logger.log(Level.INFO, "Ответ об ошибке отправлен клиенту " + sender);
+                                    } catch (IOException sendEx) {
+                                        logger.log(Level.SEVERE, "Не удалось отправить ответ об ошибке клиенту " + sender + ": " + sendEx.getMessage());
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            } catch (Exception e) {
+                } catch (Exception _) {}
             }
-        }
+        });
         stop();
     }
 

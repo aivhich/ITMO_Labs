@@ -3,9 +3,13 @@ package org.ivanrevich.commands;
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.managers.UserManager;
+import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
+
+import java.util.Objects;
 
 /**
  * Команда удаления элемента по идентификатору.
@@ -28,9 +32,15 @@ public class RemoveById implements Command{
     @Override
     public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
+        UserManager userManager = managersLocator.get(UserManager.class);
 
         try {
             int id = Integer.parseInt(String.valueOf(r.getArgs()));
+            if(!Objects.equals(queueManager.getOwnerById(id), userManager.getIdForUser(r.getCredentials()))) {
+                return new Result<>(ResultCode.HAVENT_OWNER_RULES,
+                        "Exception while update vehicle. You haven't owner rules",
+                        "Exception while update vehicle. You haven't owner rules");
+            }
             queueManager.remove_by_id(id);
 
             return new Result<>(ResultCode.SUCCESS, "Success", id);

@@ -1,17 +1,20 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.auth.Credentials;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.persistence.EntityManager;
 
 import javax.sql.DataSource;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class PsqlQueueManagerImpl implements QueueManager{
     private final EntityManager entityManager;
     private final PriorityQueue<Vehicle> inMemoryPriorityQueue = new PriorityQueue<>();
-    private final Instant initDate = Instant.now();
+//    private final Instant initDate = Instant.now();
 
     public PsqlQueueManagerImpl(DataSource dataSource) {
         this.entityManager = new EntityManager(dataSource);
@@ -23,14 +26,10 @@ public class PsqlQueueManagerImpl implements QueueManager{
 
     @Override
     public void add(Vehicle vehicle) {
-        Vehicle v=entityManager.save(vehicle);
+        Vehicle v = entityManager.save(vehicle);
         inMemoryPriorityQueue.add(v);
     }
 
-    @Override
-    public Instant getInitDate() {
-        return initDate;
-    }
 
     @Override
     public int size() {
@@ -40,6 +39,15 @@ public class PsqlQueueManagerImpl implements QueueManager{
     @Override
     public Boolean isExistWithId(int id) {
         return inMemoryPriorityQueue.stream().anyMatch(vehicle -> vehicle.getId() == id);
+    }
+
+    @Override
+    public Integer getOwnerById(int id) {
+        try {
+            return inMemoryPriorityQueue.stream().filter(vehicle -> vehicle.getId() == id).findFirst().orElseThrow().getAuthorId();
+        }catch (NoSuchElementException e){
+            return -1;
+        }
     }
 
     @Override
@@ -77,9 +85,19 @@ public class PsqlQueueManagerImpl implements QueueManager{
     @Override
     public void clear() {
         for(Vehicle v:entityManager.findAll(Vehicle.class)){
-            inMemoryPriorityQueue.remove(v);
+            entityManager.deleteById(Vehicle.class, v.getId());
         }
         inMemoryPriorityQueue.clear();
+    }
+
+    @Override
+    public void clear(Integer byUserId) {
+        for(Vehicle v:entityManager.findAll(Vehicle.class)){
+            if(Objects.equals(v.getAuthorId(), byUserId)) {
+                entityManager.deleteById(Vehicle.class, v.getId());
+            }
+        }
+        inMemoryPriorityQueue.removeIf(vehicle -> Objects.equals(vehicle.getAuthorId(), byUserId));
     }
 
     /// ACTUALLY it's doing nothing now
@@ -97,5 +115,10 @@ public class PsqlQueueManagerImpl implements QueueManager{
             Vehicle v2 = entityManager.save(v);
             inMemoryPriorityQueue.add(v2);
         }
+    }
+
+    @Override
+    public Vehicle getLast() {
+        return inMemoryPriorityQueue.peek();
     }
 }

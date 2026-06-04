@@ -2,6 +2,7 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.QueueManager;
+import org.ivanrevich.managers.UserManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Result;
 import org.ivanrevich.utils.ResultCode;
@@ -22,7 +23,8 @@ public class Clear implements Command{
     @Override
     public Result<?> run(Request<?> r) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
-        queueManager.clear();
+        UserManager userManager = managersLocator.get(UserManager.class);
+        queueManager.clear(userManager.getIdForUser(r.getCredentials()));
         return new Result<>(ResultCode.SUCCESS, "Success", "Successfully clear collection");
     }
 

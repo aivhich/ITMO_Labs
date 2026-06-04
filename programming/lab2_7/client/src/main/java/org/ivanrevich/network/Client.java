@@ -1,5 +1,7 @@
 package org.ivanrevich.network;
 
+import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
 import org.ivanrevich.utils.Deserializer;
@@ -20,15 +22,20 @@ public class Client {
     private final Serializer serializer = new Serializer();
     private static final int TIMEOUT_MS = 1000;
     private static final int MAX_RETRIES = 5;
+    private final ManagersLocator managersLocator;
 
-    public Client(SocketAddress remoteServer) throws IOException {
+    public Client(SocketAddress remoteServer, ManagersLocator managersLocator) throws IOException {
         this.remoteServer = remoteServer;
         this.socket = new DatagramSocket();
+        this.managersLocator = managersLocator;
         socket.connect(remoteServer);
         socket.setSoTimeout(TIMEOUT_MS);
     }
 
     public Response<?> sendObject(Request<?> request) throws IOException, ClassNotFoundException {
+        AuthManager authManager = managersLocator.get(AuthManager.class);
+        request.setCredentials(authManager.getCredentials());
+
         IOException lastException = null;
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {

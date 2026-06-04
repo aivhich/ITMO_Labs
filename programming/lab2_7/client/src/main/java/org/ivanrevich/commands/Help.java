@@ -38,6 +38,7 @@ public class Help implements Command{
         try {
             Response<?> r = client.sendObject(new Request<>(CommandType.HELP, null));
             ioManager.write((String) r.getBody());
+
             return r.getResultCode();
         } catch (IOException e) {
             return ResultCode.INTERNAL_CLI_ERROR;

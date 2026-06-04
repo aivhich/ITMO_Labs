@@ -36,6 +36,11 @@ public class Help implements Command{
                 out.append(c.toString()+"\n");
             }
         }
+        for(Command c: commandManager.getPubCommands()){
+            if(!(c instanceof Save)){
+                out.append(c.toString()+"\n");
+            }
+        }
         return new Result<>(ResultCode.SUCCESS, "Success", out.toString());
     }
 

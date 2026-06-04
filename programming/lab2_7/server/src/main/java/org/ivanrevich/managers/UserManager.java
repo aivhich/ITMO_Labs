@@ -8,5 +8,5 @@ public interface UserManager {
     //void login(Credentials credentials);
     //void logout(Credentials credentials);
     void changePassword(Credentials old, String newPassword);
-    boolean verify(Credentials credentials);
+    User verify(Credentials credentials);
 }

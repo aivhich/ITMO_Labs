@@ -2,6 +2,7 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.factory.VehicleFactory;
+import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.network.Client;
@@ -55,8 +56,12 @@ public class Add implements Command {
     @Override
     public ResultCode run(String[] args) {
         IOManager ioManager = managersLocator.get(IOManager.class);
+        AuthManager authManager = managersLocator.get(AuthManager.class);
         Client client = managersLocator.get(Client.class);
         Vehicle vehicle = (new VehicleFactory(ioManager)).createVehicle();
+
+        vehicle.setAuthorId(authManager.authorizedUserId());
+
         try {
             Response<?> r = client.sendObject(new Request<Vehicle>(CommandType.ADD, vehicle));
             return r.getResultCode();

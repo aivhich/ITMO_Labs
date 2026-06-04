@@ -14,6 +14,10 @@ public class Request<T> implements Serializable {
         this.args = args;
     }
 
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
+    }
+
     public Credentials getCredentials() {
         return credentials;
     }

@@ -41,7 +41,6 @@ public class Server {
 
     public void run() throws Exception {
         CommandManager commandManager = managersLocator.get(CommandManager.class);
-        UserManager userManager = managersLocator.get(UserManager.class);
         running = true;
 
         logger.log(Level.INFO, "Сервер начал прослушивание входящих запросов");
@@ -119,35 +118,6 @@ public class Server {
 
                         Request<?> request = readResult.request();
                         sender = readResult.senderAddress();
-
-                        /// CREATE USER
-                        if(request.getCommandType() == CommandType.SIGNUP){
-                            User user = userManager.signup(request.getCredentials());
-                            logger.log(Level.INFO, "Зарегистрирован новый пользователь "+user.getUsername());
-                            ResponseHandler.apply(key,
-                                    new Result<>(
-                                            ResultCode.SUCCESS,
-                                            "Successfully signed up",
-                                            user
-                                    ),
-                                    sender
-                            );
-                            continue;
-                        }
-
-                        /// BLOCK UNAUTHORIZED REQUEST
-                        if(!userManager.verify(request.getCredentials())){
-                            logger.log(Level.INFO, "Запрос от незарегистрировано пользователя");
-                            ResponseHandler.apply(key,
-                                    new Result<>(
-                                            ResultCode.UNAUTHORIZED_REQUEST,
-                                            "UNAUTHORIZED_REQUEST",
-                                            "UNAUTHORIZED_REQUEST"
-                                    ),
-                                    sender
-                            );
-                            continue;
-                        }
 
 
                         logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());

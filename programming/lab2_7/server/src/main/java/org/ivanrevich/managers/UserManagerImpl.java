@@ -36,13 +36,13 @@ public class UserManagerImpl implements UserManager{
     }
 
     @Override
-    public boolean verify(Credentials credentials) {
+    public User verify(Credentials credentials) {
         User user = entityManager.findByField(User.class, "username", credentials.getUsername()).orElse(null);
         if(user!=null) {
             if(user.isPasswordEqual(credentials.getPassword())){
-                return true;
+                return user;
             }
         }
-        return false;
+        return null;
     }
 }

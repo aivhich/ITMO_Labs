@@ -5,25 +5,34 @@ import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
-
 import java.net.InetSocketAddress;
 import java.util.Map;
 
 public class ClientMain {
     public static void main(String[] args) throws Exception {
-        Client client = new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])));
         boolean workMode = true;
 
         ManagersLocator managersLocator = new ManagersLocator();
+
+
+        Client client = new Client(new InetSocketAddress(args[0], Integer.parseInt(args[1])), managersLocator);
         IOManager ioManager = new IOManagerImpl(false);
         IOManagerStack ioStack = new IOManagerStack(ioManager);
+
+        AuthManager authManager = new AuthManagerImpl(managersLocator);
         CommandManager commandManager = new CommandManagerImpl();
 
+        managersLocator.register(AuthManager.class, authManager);
         managersLocator.register(IOManagerStack.class, ioStack);
         managersLocator.register(IOManager.class, ioManager);
         managersLocator.register(Client.class, client);
         managersLocator.register(CommandManager.class, commandManager);
 
+
+        commandManager.registerNoAuthCommands(Map.of(
+                CommandType.SIGNUP.getName(), new Signup(managersLocator),
+                CommandType.LOGIN.getName(), new Login(managersLocator)
+        ));
         commandManager.registerCommands(
                 Map.ofEntries(
                         Map.entry(CommandType.ADD.getName(), new Add(managersLocator)),

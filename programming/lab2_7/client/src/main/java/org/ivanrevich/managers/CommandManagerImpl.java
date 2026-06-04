@@ -1,5 +1,6 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.commands.Command;
 import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.utils.CommandObj;
@@ -22,28 +23,30 @@ import java.util.Map;
  */
 public class CommandManagerImpl implements CommandManager {
     private final HashMap<String, Command> availableCommands = new HashMap<>();
-//    private final ArrayList<CommandObj> history = new ArrayList<>();
-//
-//    @Override
-//    public ArrayList<CommandObj> getHistory() {
-//        return history;
-//    }
+    private final HashMap<String, Command> publicCommands = new HashMap<>();
+
 
     @Override
     public void run(String cmd) {
         CommandObj parsedCommand = CommandManager.parseCommand(cmd);
 
+        /// AUTH
+        if(publicCommands.containsKey(parsedCommand.name())){
+            ResultCode result = publicCommands.get(parsedCommand.name()).run(parsedCommand.args());
+            if (result != ResultCode.SUCCESS) {
+                System.out.println("[" + result.name() + "] " + result.getMessage());
+            }
+            return;
+        }
+
+        /// SIGN IN
         if (!availableCommands.containsKey(parsedCommand.name())) {
             throw new AppException(ResultCode.COMMAND_NOT_FOUND);
         }
-
         ResultCode result = availableCommands.get(parsedCommand.name()).run(parsedCommand.args());
-
         if (result != ResultCode.SUCCESS) {
             System.out.println("[" + result.name() + "] " + result.getMessage());
         }
-
-        //history.add(parsedCommand);
     }
 
     @Override
@@ -54,5 +57,15 @@ public class CommandManagerImpl implements CommandManager {
     @Override
     public Collection<Command> getRegistedCommands() {
         return availableCommands.values();
+    }
+
+    @Override
+    public void registerNoAuthCommands(Map<String, Command> commands) {
+        publicCommands.putAll(commands);
+    }
+
+    @Override
+    public Collection<Command> getPubCommands() {
+        return publicCommands.values();
     }
 }

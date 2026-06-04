@@ -71,4 +71,8 @@ public interface CommandManager {
      * @param commands карта имя → команда
      */
     void registerCommands(Map<String, Command> commands);
+
+    void registerNoAuthCommands(Map<String, Command> commands);
+
+    Collection<Command> getPubCommands();
 }

@@ -1,6 +1,5 @@
 package org.ivanrevich;
 
-import org.ivanrevich.auth.User;
 import org.ivanrevich.commands.*;
 import org.ivanrevich.config.AppConfig;
 import org.ivanrevich.config.DataSourceConfig;
@@ -60,6 +59,10 @@ public class MainServer {
         CommandManager commandManager = new CommandManagerImpl(managersLocator);
         managersLocator.register(CommandManager.class, commandManager);
 
+        commandManager.registerNoAuthCommands(Map.of(
+                CommandType.LOGIN.getName(), new Login(managersLocator),
+                CommandType.SIGNUP.getName(), new Signup(managersLocator)
+        ));
         commandManager.registerCommands(
                 Map.ofEntries(
                         Map.entry(CommandType.ADD.getName(), new Add(managersLocator)), //checked c-s

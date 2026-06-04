@@ -18,6 +18,7 @@ public enum CommandType {
     SHOW("show"),
     UPDATE("update"),
 
+    LOGIN("login"),
     SIGNUP("signup");
 
     private final String name;

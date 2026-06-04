@@ -4,16 +4,16 @@ import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.utils.ResultCode;
 
-public class Signup implements Command{
+public class Login implements Command{
     private final ManagersLocator managersLocator;
 
-    public Signup(ManagersLocator managersLocator) {
+    public Login(ManagersLocator managersLocator) {
         this.managersLocator = managersLocator;
     }
 
     @Override
     public String toString() {
-        return "signup [username] [password]: create new user";
+        return "login [username] [password]: send request to check and set your credentials";
     }
 
     @Override
@@ -23,11 +23,10 @@ public class Signup implements Command{
         if(args.length != 2){
             return ResultCode.INVALID_REQUEST;
         }
-        if(authManager.register(args[0], args[1])) {
+        boolean isSuccessfullyLoggedIn = authManager.authenticate(args[0], args[1]);
+        if(isSuccessfullyLoggedIn){
             return ResultCode.SUCCESS;
         }
-        else{
-            return ResultCode.INVALID_REQUEST; // TODO
-        }
+        return ResultCode.INVALID_REQUEST;//TODO
     }
 }

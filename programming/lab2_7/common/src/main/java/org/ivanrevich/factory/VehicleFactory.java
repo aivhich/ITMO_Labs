@@ -82,6 +82,7 @@ public class VehicleFactory {
                 .with(Vehicle::setNumberOfWheels, numberOfWheels)
                 .with(Vehicle::setType, type)
                 .with(Vehicle::setFuelType, fuelType)
+                .with(Vehicle::setAuthorId, 0) // TODO ADD ADMIN ACCOUNT
                 .build();
     }
 
@@ -139,7 +140,9 @@ public class VehicleFactory {
                 .with(Vehicle::setCoordinates, (new CoordinatesFactory(ioManager)).updateCoordinates(old.getCoordinates()))
                 .with(Vehicle::setCreationDate, old.getCreationDate()).with(Vehicle::setType, type)
                 .with(Vehicle::setNumberOfWheels, numberOfWheels)
-                .with(Vehicle::setFuelType, fuelType).build();
+                .with(Vehicle::setFuelType, fuelType)
+                .with(Vehicle::setAuthorId, 0) // TODO ADD ADMIN ACCOUNT
+                .build();
     }
 
     public Vehicle createVehicleForRef(){

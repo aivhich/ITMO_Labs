@@ -55,6 +55,9 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
     @Column(name="fuelType")
     private FuelType fuelType; //Поле не может быть null
 
+    @Column(name="author")
+    private Integer authorId;
+
 
     public String toCsvString() {
         return id +
@@ -65,7 +68,16 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
                 "," + enginePower +
                 "," + numberOfWheels +
                 "," + type +
-                "," + fuelType;
+                "," + fuelType+
+                "," + authorId;
+    }
+
+    public Integer getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Integer authorId) {
+        this.authorId = authorId;
     }
 
     public String escapeCSV(String field) {
@@ -86,15 +98,14 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
 
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Vehicle vehicle = (Vehicle) o;
-        return id == vehicle.id && numberOfWheels == vehicle.numberOfWheels && Objects.equals(name, vehicle.name) && Objects.equals(coordinates, vehicle.coordinates) && Objects.equals(creationDate, vehicle.creationDate) && Objects.equals(enginePower, vehicle.enginePower) && type == vehicle.type && fuelType == vehicle.fuelType;
+    public boolean equals(Object object) {
+        if (!(object instanceof Vehicle vehicle)) return false;
+        return id == vehicle.id && numberOfWheels == vehicle.numberOfWheels && Objects.equals(name, vehicle.name) && Objects.equals(coordinates, vehicle.coordinates) && Objects.equals(creationDate, vehicle.creationDate) && Objects.equals(enginePower, vehicle.enginePower) && type == vehicle.type && fuelType == vehicle.fuelType && Objects.equals(authorId, vehicle.authorId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, coordinates, creationDate, enginePower, numberOfWheels, type, fuelType);
+        return Objects.hash(id, name, coordinates, creationDate, enginePower, numberOfWheels, type, fuelType, authorId);
     }
 
     @Override
@@ -108,7 +119,7 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
                 ", numberOfWheels=" + numberOfWheels +
                 ", type=" + type +
                 ", fuelType=" + fuelType +
-                '}';
+                ", authorId="+authorId+'}';
     }
 
     public void setId(int id) {

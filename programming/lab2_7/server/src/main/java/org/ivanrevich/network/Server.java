@@ -119,9 +119,14 @@ public class Server {
                     if (!key.isValid()) continue;
 
                     if (key.isReadable()) {
-                        byte[] rawData = RawReader.read(key); /// todo here
-                        if (rawData == null) continue;
-                        readPool.submit(() -> handleRequest(key, commandManager));
+                        InetSocketAddress sender = null;
+                        ReadResult readResult = RequestHandler.apply(key);
+                        if (readResult == null) {
+                            logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
+                            return;
+                        }
+
+                        readPool.submit(() -> handleRequest(key, readResult, commandManager));
                     }
                 }
             } catch (Exception _) {}
@@ -162,19 +167,10 @@ public class Server {
         }
     }
 
-
-
-    private void handleRequest(SelectionKey key, CommandManager commandManager){
+    private void handleRequest(SelectionKey key, ReadResult readResult, CommandManager commandManager){
         try{
-            InetSocketAddress sender = null;
-            ReadResult readResult = RequestHandler.apply(key);
-            if (readResult == null) {
-                logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
-                return;
-            }
-
             Request<?> request = readResult.request();
-            sender = readResult.senderAddress();
+            InetSocketAddress sender = readResult.senderAddress();
             final InetSocketAddress clientAddress = sender;
             logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
             handlePool.submit(() -> runRequest(key, request, clientAddress, commandManager));
@@ -182,6 +178,26 @@ public class Server {
             logger.log(Level.WARNING, "Ошибка чтения запроса: " + e.getMessage());
         }
     }
+
+
+//    private void handleRequest(SelectionKey key, CommandManager commandManager){
+//        try{
+//            InetSocketAddress sender = null;
+//            ReadResult readResult = RequestHandler.apply(key);
+//            if (readResult == null) {
+//                logger.log(Level.WARNING, "Получен пустой запрос, пропускаем");
+//                return;
+//            }
+//
+//            Request<?> request = readResult.request();
+//            sender = readResult.senderAddress();
+//            final InetSocketAddress clientAddress = sender;
+//            logger.log(Level.INFO, "Получен запрос от " + sender + " | команда: " + request.getCommandType());
+//            handlePool.submit(() -> runRequest(key, request, clientAddress, commandManager));
+//        } catch (Exception e) {
+//            logger.log(Level.WARNING, "Ошибка чтения запроса: " + e.getMessage());
+//        }
+//    }
 
     public void stop() throws IOException {
         if(!running) return;

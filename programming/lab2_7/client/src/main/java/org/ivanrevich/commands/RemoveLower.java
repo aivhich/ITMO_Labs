@@ -2,6 +2,7 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.factory.VehicleFactory;
+import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.models.Vehicle;
 import org.ivanrevich.network.Client;
@@ -35,12 +36,14 @@ public class RemoveLower implements Command{
     public ResultCode run(String[] args) {
         IOManager io = managersLocator.get(IOManager.class);
         Client client = managersLocator.get(Client.class);
+        AuthManager authManager = managersLocator.get(AuthManager.class);
         io.write("Enter the reference vehicle to remove all lower elements:");
         VehicleFactory factory = new VehicleFactory(io);
         Vehicle reference;
 
         try {
             reference = factory.createVehicleForRef();
+            reference.setAuthorId(authManager.authorizedUserId());
             Response<?> r = client.sendObject(new Request<>(CommandType.REMOVE_LOWER, reference));
             int removedCount = (int) r.getBody();
             io.write("Removed " + removedCount + " vehicles that were lower than the reference.");

@@ -25,7 +25,7 @@ tasks.jar {
 
 dependencies {
     implementation(project(":common"))
-
+    implementation("org.slf4j:slf4j-simple:1.7.21")
     implementation(project(":revORM"))
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.1.0")

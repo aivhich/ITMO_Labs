@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
     public static DataSource create(String url, String user, String password) {
         HikariConfig config = new HikariConfig();
+        config.setDriverClassName("org.postgresql.Driver");
         config.setJdbcUrl(url);
         config.setUsername(user);
         config.setPassword(password);

@@ -1,7 +1,9 @@
 package org.ivanrevich.auth;
 
-public record UserDTO(
+import java.io.Serializable;
+
+public record UserDTO (
         int id,
         String username
-) {
+) implements Serializable {
 }

@@ -23,7 +23,11 @@ public class PsqlStorageManagerImpl implements StorageManager{
             if (entityManager.existsById(Vehicle.class, vehicle.getId())) {
                 entityManager.update(vehicle);
             } else {
-                entityManager.save(vehicle);
+                try {
+                    entityManager.save(vehicle);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

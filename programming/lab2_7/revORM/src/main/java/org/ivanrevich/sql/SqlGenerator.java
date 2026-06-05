@@ -3,10 +3,13 @@ package org.ivanrevich.sql;
 import org.ivanrevich.metadata.ColumnMetadata;
 import org.ivanrevich.metadata.EntityMetadata;
 
+import java.util.Date;
+
 public class SqlGenerator {
     private String resolveType(ColumnMetadata col) {
         Class<?> type = col.getField().getType();
         if (type == String.class) return "VARCHAR(255) NOT NULL";
+        if (type == byte[].class) return "bytea NOT NULL";
         if (type == int.class || type == Integer.class) return "INTEGER NOT NULL";
         if (type == long.class || type == Long.class) return "BIGINT NOT NULL";
         if (type == float.class || type == Float.class) return "REAL NOT NULL";
@@ -49,7 +52,7 @@ public class SqlGenerator {
         columns.setLength(columns.length()-1);
         values.setLength(values.length()-1);
         return String.format("" +
-                "INSERT INЕO %s (%s) VALUES (%s) RETURNING %s",
+                "INSERT INTO %s (%s) VALUES (%s) RETURNING %s",
                 metadata.getTableName(),
                 columns,
                 values,

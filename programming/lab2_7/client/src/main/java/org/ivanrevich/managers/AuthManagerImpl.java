@@ -30,7 +30,10 @@ public class AuthManagerImpl implements AuthManager{
         Client client = managersLocator.get(Client.class);
         Credentials rCred = new Credentials(username, password);
         try {
-            Response<Integer> response = (Response<Integer>) client.sendObject(new Request<>(CommandType.LOGIN, rCred)).getBody();
+            Response<Integer> response = (Response<Integer>) client.sendObject(new Request<>(CommandType.LOGIN, rCred));
+            System.out.println(response.getBody());
+            System.out.println(response.getResultCode());
+            System.out.println(response.getMessage());
             if(response.getResultCode() == ResultCode.SUCCESS) {
                 credentials = rCred;
                 userId = response.getBody();
@@ -44,7 +47,7 @@ public class AuthManagerImpl implements AuthManager{
 
     @Override
     public Integer authorizedUserId() {
-        return 0;
+        return userId;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class AuthManagerImpl implements AuthManager{
         Client client = managersLocator.get(Client.class);
         Credentials rCred = new Credentials(username, password);
         try {
-            Response<?> response = (Response<?>) client.sendObject(new Request<>(CommandType.SIGNUP, rCred)).getBody();
+            Response<?> response = (Response<?>) client.sendObject(new Request<>(CommandType.SIGNUP, rCred)); /// sigup data in body orin cred??? TODO DEBUG HERE
             if(response.getResultCode() == ResultCode.SUCCESS && response.getBody() instanceof UserDTO) {
                 return true;
             }

@@ -24,7 +24,7 @@ public class EntityManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T save(T entity) {
+    public <T> T save(T entity)  {
         return (T) repoFor(entity.getClass()).save(entity);
     }
 

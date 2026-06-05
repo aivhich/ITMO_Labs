@@ -19,6 +19,7 @@ public class UserManagerImpl implements UserManager{
     public User signup(Credentials credentials) {
         if(entityManager.findByField(User.class, "username", credentials.getUsername()).isEmpty()){
             User user = new User(credentials.getUsername(), credentials.getPassword());
+            entityManager.save(user);
             return user;
         };
         return null;

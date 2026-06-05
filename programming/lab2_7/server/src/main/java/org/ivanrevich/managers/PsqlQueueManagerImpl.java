@@ -26,7 +26,12 @@ public class PsqlQueueManagerImpl implements QueueManager{
 
     @Override
     public synchronized void add(Vehicle vehicle) {
-        Vehicle v = entityManager.save(vehicle);
+        Vehicle v = null;
+        try {
+            v = entityManager.save(vehicle);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         inMemoryPriorityQueue.add(v);
     }
 
@@ -112,7 +117,12 @@ public class PsqlQueueManagerImpl implements QueueManager{
     @Override
     public synchronized void set(List<Vehicle> vehicles) {
         for(Vehicle v:vehicles){
-            Vehicle v2 = entityManager.save(v);
+            Vehicle v2 = null;
+            try {
+                v2 = entityManager.save(v);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             inMemoryPriorityQueue.add(v2);
         }
     }

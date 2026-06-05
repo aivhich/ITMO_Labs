@@ -18,28 +18,25 @@ import java.util.logging.Logger;
 
 public class MainServer {
     private static final Logger logger = Logger.getLogger(MainServer.class.getName());
-    private static final String dbUrl = AppConfig.getConfig("db.url","jdbc:postgresql://localhost:5432/proglab7");
+    private static final String dbUrl = AppConfig.getConfig("db.url","jdbc:postgresql://localhost:5432/proglab7/");
     private static final String dbUser = AppConfig.getConfig("db.user","postgres");
     private static final String dbPassword = AppConfig.getConfig("db.password","249120");
 
     public static void main(String[] args) throws Exception {
         AtomicBoolean collectionWasSaved = new AtomicBoolean(false);
-        if (args.length < 2) {
-            System.err.println("Использование: MainServer <port> <path-to-csv>");
+        if (args.length < 1) {
+            System.err.println("Использование: MainServer <port>");
             System.exit(1);
         }
 
         int port = Integer.parseInt(args[0]);
-        String path = args[1];
 
-        logger.log(Level.INFO, "Запуск сервера на порту " + port + ", файл коллекции: " + path);
+        logger.log(Level.INFO, "Запуск сервера на порту " + port);
 
         DataSource dataSource = DataSourceConfig.create(dbUrl, dbUser, dbPassword);
         UserManager userManager = new UserManagerImpl(dataSource);
 
-        //QueueManager queueManager = new QueueManagerImpl();
         QueueManager queueManager = new PsqlQueueManagerImpl(dataSource);
-        //StorageManager storageManager = new StorageManagerImpl(path, queueManager);
         StorageManager storageManager = new PsqlStorageManagerImpl(dataSource);
 
         TerminalConfigurator terminalConfigurator = new TerminalConfigurator();
@@ -78,13 +75,13 @@ public class MainServer {
                         Map.entry(CommandType.REMOVE_BY_ID.getName(), new RemoveById(managersLocator)), // checked c-s
                         Map.entry(CommandType.REMOVE_HEAD.getName(), new RemoveHead(managersLocator)),  // checked c-s
                         Map.entry(CommandType.REMOVE_LOWER.getName(), new RemoveLower(managersLocator)), // checked c-s
-                        Map.entry(CommandType.SAVE.getName(), new Save(managersLocator, path)), // checked c-s
+                        Map.entry(CommandType.SAVE.getName(), new Save(managersLocator, "")), // checked c-s
                         Map.entry(CommandType.SHOW.getName(), new Show(managersLocator)), // checked c-s
                         Map.entry(CommandType.UPDATE.getName(), new Update(managersLocator)) // checked c-s
                 )
         );
         Thread save = new Thread(() -> {
-            logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию в " + path);
+            logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию ");
             try {
                 commandManager.run(new Request<>(CommandType.SAVE, new ArrayList()));
                 collectionWasSaved.set(true);

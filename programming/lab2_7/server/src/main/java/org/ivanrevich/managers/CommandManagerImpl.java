@@ -63,7 +63,6 @@ public class CommandManagerImpl implements CommandManager {
             history.add(new CommandObj(commandName, new String[]{}));
             return result;
         }
-        System.out.println("pub command");
         return pubCommand.run(r);
     }
 

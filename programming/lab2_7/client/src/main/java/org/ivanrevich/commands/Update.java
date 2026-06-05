@@ -2,6 +2,7 @@ package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.factory.VehicleFactory;
+import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.managers.CommandManager;
 import org.ivanrevich.managers.IOManager;
 import org.ivanrevich.models.Vehicle;
@@ -37,6 +38,7 @@ public class Update implements Command{
     public ResultCode run(String[] args) {
         if(args.length!=1) return ResultCode.INVALID_NUM_OF_ARGS;
         Client client = managersLocator.get(Client.class);
+        AuthManager authManager = managersLocator.get(AuthManager.class);
         CommandManager commandManager = managersLocator.get(CommandManager.class);
         IOManager ioManager = managersLocator.get(IOManager.class);
 
@@ -52,6 +54,7 @@ public class Update implements Command{
             ioManager.write(old.get().toString());
 
             Vehicle newveh =  (new VehicleFactory(ioManager)).updateVehicle(old.get());
+            newveh.setAuthorId(authManager.authorizedUserId());
             Response<?> r = client.sendObject(new Request<>(CommandType.UPDATE, newveh));
 
             ioManager.write("Request to updated vehicle name has been sent: " + newveh.getId());

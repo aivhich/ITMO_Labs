@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.auth.Credentials;
 import org.ivanrevich.auth.User;
 import org.ivanrevich.auth.UserDTO;
 import org.ivanrevich.managers.UserManager;
@@ -33,7 +34,9 @@ public class Signup implements Command{
         logger.log(Level.INFO, "start signup ");
         UserManager userManager = managersLocator.get(UserManager.class);
         /// CREATE USER
-        User user = userManager.signup(r.getCredentials());
+        Credentials credentials = (Credentials) r.getArgs();
+        logger.log(Level.INFO, "start signup "+credentials.getUsername());
+        User user = userManager.signup(credentials);
         logger.log(Level.INFO, "Зарегистрирован новый пользователь "+user.getUsername());
         return new Result<>(ResultCode.SUCCESS,
                 "Successfully created new user",

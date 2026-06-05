@@ -6,7 +6,9 @@ import org.ivanrevich.metadata.EntityMetadata;
 import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,6 +72,9 @@ public class ReflectionMapper {
             return ((Number) value).floatValue();
         if ((targetType == boolean.class || targetType == Boolean.class) && value instanceof Number)
             return ((Number) value).intValue() != 0;
+
+        if ((targetType == java.util.Date.class) && value instanceof Number)
+            return Date.from(Instant.ofEpochSecond((Long) value));
         if (targetType.isEnum())
             return Enum.valueOf((Class<Enum>) targetType, value.toString());
 

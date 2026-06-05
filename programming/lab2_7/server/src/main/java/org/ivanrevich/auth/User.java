@@ -3,6 +3,7 @@ package org.ivanrevich.auth;
 import org.ivanrevich.annotations.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 @Entity
 @Table(name="user_")
@@ -20,6 +21,12 @@ public class User implements Serializable {
     @Column(name="salt")
     private String salt;
 
+    public void setPassword(String password) {
+        this.password = password.getBytes();
+    }
+
+    public User() {
+    }
 
     public User(String username, String password) {
         this.username = username;
@@ -50,7 +57,7 @@ public class User implements Serializable {
     }
 
     public boolean isPasswordEqual(String outerPassword) {
-        return (PasswordService.getHash(outerPassword, salt).equals(password));
+        return (Arrays.equals(PasswordService.getHash(outerPassword, salt), password));
     }
 
     public void updatePassword(String newPassword) {

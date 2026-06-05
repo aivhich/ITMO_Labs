@@ -1,6 +1,7 @@
 package org.ivanrevich.commands;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.auth.Credentials;
 import org.ivanrevich.auth.User;
 import org.ivanrevich.managers.UserManager;
 import org.ivanrevich.network.Server;
@@ -28,15 +29,16 @@ public class Login implements Command{
     @Override
     public Result<?> run(Request<?> r) {
         UserManager userManager = managersLocator.get(UserManager.class);
-        User user = userManager.verify(r.getCredentials());
+        Credentials credentials =  (Credentials) r.getArgs();
+        User user = userManager.verify(credentials);
         if(user!=null){
             return new Result<>(ResultCode.SUCCESS,
-                    "Successfully logged user "+r.getCredentials().getUsername(),
+                    "Successfully logged user "+credentials.getUsername(),
                     user.getId());
         }
 
         return new Result<>(ResultCode.INVALID_INPUT,
-                "Successfully logged user "+r.getCredentials().getUsername(),
+                "FAILED logged user "+credentials.getUsername(),
                 null);
     }
 

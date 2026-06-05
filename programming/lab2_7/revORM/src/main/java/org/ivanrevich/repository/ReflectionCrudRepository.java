@@ -31,7 +31,7 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
         String sql = String.format("SELECT * FROM %s WHERE %s = ?", metadata.getTableName(), columnName);
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setObject(1, value);
+            bindValue(ps, 1, value);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return Optional.of(mapper.mapRow(rs, clazz, metadata));
                 return Optional.empty();
@@ -53,13 +53,15 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
     }
 
     @Override
-    public T save(T entity) {
+    public T save(T entity)  {
         String sql = sqlGenerator.buildInsert(metadata);
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try(
+        Connection con = dataSource.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(sql);
 
             bindInsertParams(ps, entity);
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     ColumnMetadata idCol = metadata.getIdColumn();
                     idCol.setValue(entity, rs.getObject(1));
@@ -67,7 +69,7 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
             }
             return entity;
         } catch (Exception e) {
-            throw new OrmException("save() failed for " + clazz.getSimpleName(), e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -139,7 +141,8 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
         int i = 1;
         for (ColumnMetadata col : metadata.getColumns()) {
             if (col.isGenerated()) continue;
-            ps.setObject(i++, col.getValue(entity));
+            Object value = col.getValue(entity);
+            bindValue(ps, i++, value);
         }
     }
 
@@ -147,9 +150,26 @@ public class ReflectionCrudRepository<T, ID> implements CrudRepository<T, ID> {
         int i = 1;
         for (ColumnMetadata col : metadata.getColumns()) {
             if (col.isId()) continue;
-            ps.setObject(i++, col.getValue(entity));
+            Object value = col.getValue(entity);
+            bindValue(ps, i++, value);
         }
         return i;
+    }
+
+    private void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
+        if (value == null) {
+            ps.setObject(index, null);
+        } else if (value instanceof java.util.Date) {
+            java.util.Date date = (java.util.Date) value;
+            ps.setTimestamp(index, new java.sql.Timestamp(date.getTime()));
+        } else if (value instanceof Enum) {
+            ps.setString(index, ((Enum<?>) value).name());
+        } else if(value instanceof byte[]) {
+            ps.setBytes(index, (byte[]) value);
+        }
+        else {
+            ps.setObject(index, value);
+        }
     }
 
     public static class OrmException extends RuntimeException {

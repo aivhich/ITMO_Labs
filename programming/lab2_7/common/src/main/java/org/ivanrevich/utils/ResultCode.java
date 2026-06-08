@@ -16,6 +16,7 @@ public enum ResultCode {
     SUCCESS("Success"),
     FAIL_0("Fail"),
     INVALID_INPUT("Invalid input"),
+    INVALID_PASSWORD("Invalid password or username"),
 
     // Скрипты
     SCRIPT_END("Script finished"),
@@ -35,6 +36,8 @@ public enum ResultCode {
     // Аргументы
     INVALID_NUM_OF_ARGS("Invalid number of arguments"),
     INVALID_ARGS("Invalid arguments"),
+
+    INVALID_USERNAME("Invalid username. Such user may exist"),
 
     // Данные
     ID_ISN_EXIST("Element with this id does not exist"),

@@ -34,7 +34,8 @@ public class ClientMain {
 
         commandManager.registerNoAuthCommands(Map.of(
                 CommandType.SIGNUP.getName(), new Signup(managersLocator),
-                CommandType.LOGIN.getName(), new Login(managersLocator)
+                CommandType.LOGIN.getName(), new Login(managersLocator),
+                CommandType.LOGOUT.getName(), new Logout(managersLocator)
         ));
         commandManager.registerCommands(
                 Map.ofEntries(
@@ -67,7 +68,6 @@ public class ClientMain {
                 commandManager.run(cmd);
 
             } catch (AppException e) {
-//                System.out.println(e.getMessage());
                 errorHandler.handle(e);
             } catch (RuntimeException e) {
                 String msg = e.getMessage();

@@ -37,7 +37,7 @@ public class Login implements Command{
                     user.getId());
         }
 
-        return new Result<>(ResultCode.INVALID_INPUT,
+        return new Result<>(ResultCode.INVALID_PASSWORD,
                 "FAILED logged user "+credentials.getUsername(),
                 null);
     }

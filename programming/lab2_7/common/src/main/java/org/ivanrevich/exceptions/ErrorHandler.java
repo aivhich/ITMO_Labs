@@ -76,6 +76,12 @@ public abstract class ErrorHandler {
             case INVALID_ARGS:
                 messageWriter.accept(getInvalidArgsMessage());
                 break;
+            case INVALID_USERNAME:
+                messageWriter.accept(getInvalidUsernameMessage());
+                break;
+            case INVALID_PASSWORD:
+                messageWriter.accept(getInvalidPasswordMessage());
+                break;
             case UNAUTHORIZED_REQUEST:
                 onUnauthorizedRequest.run();
                 break;
@@ -84,6 +90,12 @@ public abstract class ErrorHandler {
         }
     }
 
+    protected String getInvalidUsernameMessage() {
+        return "Invalid username, try use other one";
+    }
+    protected String getInvalidPasswordMessage() {
+        return "Invalid password or username";
+    }
     protected String getCommandNotFoundMessage() {
         return "Command not found. Type 'help' for list of commands.";
     }

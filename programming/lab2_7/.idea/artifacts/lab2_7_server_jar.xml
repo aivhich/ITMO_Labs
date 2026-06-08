@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="lab2_7.server:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lab2_7_server_jar</output-path>
+    <root id="archive" name="lab2_7.server.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/revORM/src/main/resources/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

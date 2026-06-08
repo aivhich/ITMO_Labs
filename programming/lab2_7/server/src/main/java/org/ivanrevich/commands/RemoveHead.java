@@ -38,7 +38,9 @@ public class RemoveHead implements Command{
     public Result<?> run(Request<?> request) {
         QueueManager queueManager = managersLocator.get(QueueManager.class);
         UserManager userManager = managersLocator.get(UserManager.class);
-
+        if(queueManager.getLast()==null){
+            return new Result<>(ResultCode.SUCCESS, "Success", null);
+        }
         if(!Objects.equals(
                 queueManager.getOwnerById(queueManager.getLast().getAuthorId()),
                 userManager.getIdForUser(request.getCredentials())
@@ -48,8 +50,6 @@ public class RemoveHead implements Command{
                     "Exception while update vehicle. You haven't owner rules");
         }
         Vehicle vehicle = queueManager.remove_head();
-        //IOManager ioManager = managersLocator.get(IOManager.class);
-        //ioManager.write(queueManager.remove_head().toString());
         return new Result<>(ResultCode.SUCCESS, "Success", vehicle);
     }
 

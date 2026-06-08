@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 
 public class MainServer {
     private static final Logger logger = Logger.getLogger(MainServer.class.getName());
-    private static final String dbUrl = AppConfig.getConfig("db.url","jdbc:postgresql://localhost:5432/proglab7/");
-    private static final String dbUser = AppConfig.getConfig("db.user","postgres");
-    private static final String dbPassword = AppConfig.getConfig("db.password","249120");
+    private static final String dbUrl = AppConfig.getConfig("db.url","jdbc:postgresql://pg:5432/studs");
+    private static final String dbUser = AppConfig.getConfig("db.user","s505326");
+    private static final String dbPassword = AppConfig.getConfig("db.password","VQjq6rDjWLc0hk0o");
 
     public static void main(String[] args) throws Exception {
         AtomicBoolean collectionWasSaved = new AtomicBoolean(false);

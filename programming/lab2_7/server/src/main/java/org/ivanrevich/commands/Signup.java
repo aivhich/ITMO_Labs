@@ -37,10 +37,15 @@ public class Signup implements Command{
         Credentials credentials = (Credentials) r.getArgs();
         logger.log(Level.INFO, "start signup "+credentials.getUsername());
         User user = userManager.signup(credentials);
-        logger.log(Level.INFO, "Зарегистрирован новый пользователь "+user.getUsername());
-        return new Result<>(ResultCode.SUCCESS,
-                "Successfully created new user",
-                new UserDTO(user.getId(), user.getUsername()));
+        if(user!=null) {
+            logger.log(Level.INFO, "Зарегистрирован новый пользователь " + user.getUsername());
+            return new Result<>(ResultCode.SUCCESS,
+                    "Successfully created new user",
+                    new UserDTO(user.getId(), user.getUsername()));
+        }else{
+            return new Result<>(ResultCode.INVALID_USERNAME,
+                    "Try to user other username",null);
+        }
     }
 
     @Override

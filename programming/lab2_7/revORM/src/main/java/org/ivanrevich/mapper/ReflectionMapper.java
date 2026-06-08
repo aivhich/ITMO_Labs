@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Маппер строк ResultSet → объект сущности через рефлексию.
- * Поддерживает @Embedded поля через ColumnMetadata.setValue().
- */
 public class ReflectionMapper {
 
     public <T> T mapRow(ResultSet rs, Class<T> clazz, EntityMetadata metadata) throws SQLException {

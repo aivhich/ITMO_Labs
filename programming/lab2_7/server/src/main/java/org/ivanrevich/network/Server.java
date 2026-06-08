@@ -98,7 +98,7 @@ public class Server {
                         readPool.submit(() -> handleRequest(key, readResult, commandManager));
                     }
                 }
-            } catch (Exception _) {}
+            } catch (Exception e) {}
         }
         stop();
     }

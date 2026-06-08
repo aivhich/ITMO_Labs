@@ -77,7 +77,9 @@ public class PsqlQueueManagerImpl implements QueueManager{
     @Override
     public synchronized Vehicle remove_head() {
         Vehicle v=inMemoryPriorityQueue.poll();
-        entityManager.deleteById(Vehicle.class, v.getId());
+        if(v!=null) {
+            entityManager.deleteById(Vehicle.class, v.getId());
+        }
         return v;
     }
 

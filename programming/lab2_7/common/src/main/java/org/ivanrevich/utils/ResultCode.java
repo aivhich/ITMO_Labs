@@ -24,6 +24,7 @@ public enum ResultCode {
     // Команды
     COMMAND_CANCELLED("Command cancelled"),
     COMMAND_SOFT_CANCELLED("Command soft cancelled"),
+
     COMMAND_NOT_FOUND("Command not found"),
     COMMAND_PARSE_ERROR("Command parse error"),
 
@@ -62,7 +63,6 @@ public enum ResultCode {
 
         throw new IllegalArgumentException("Unknown message: " + message);
     }
-
     public String getMessage() {
         return message;
     }

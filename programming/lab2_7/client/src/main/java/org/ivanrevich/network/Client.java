@@ -1,13 +1,11 @@
 package org.ivanrevich.network;
 
 import org.ivanrevich.ManagersLocator;
+import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.managers.AuthManager;
 import org.ivanrevich.requests.Request;
 import org.ivanrevich.responses.Response;
-import org.ivanrevich.utils.Deserializer;
-import org.ivanrevich.utils.Fragment;
-import org.ivanrevich.utils.FragmentInfo;
-import org.ivanrevich.utils.Serializer;
+import org.ivanrevich.utils.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -40,7 +38,10 @@ public class Client {
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                return doSend(request);
+                Response<?> response = doSend(request);
+                if(response.getResultCode()== ResultCode.SUCCESS)
+                    return response;
+                throw new AppException(response.getResultCode());
             } catch (SocketTimeoutException e) {
                 lastException = e;
                 System.err.println("[Client] Сервер недоступен, попытка " + attempt + "/" + MAX_RETRIES + "...");

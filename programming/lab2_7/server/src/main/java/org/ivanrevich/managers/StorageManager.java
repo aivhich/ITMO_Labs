@@ -16,7 +16,7 @@ import java.util.List;
  * @see Vehicle
  * @see StorageManagerImpl
  */
-public interface StorageManager extends Manager {
+public interface StorageManager {
     void save(ArrayList<Vehicle> queue, String path);
 
     List<Vehicle> load(String path);

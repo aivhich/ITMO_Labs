@@ -49,13 +49,11 @@ public class CommandManagerImpl implements CommandManager {
 
         String commandName = r.getCommandType().getName();
         Command pubCommand = publicCommands.get(commandName);
-
         if(pubCommand == null) {
             /// BLOCK UNAUTHORIZED REQUEST
-            if(userManager.verify(r.getCredentials()) == null){
-                System.out.println("cred is null");
-                logger.log(Level.INFO, "Запрос от незарегистрировано пользователя");
-                return new Result<>(ResultCode.UNAUTHORIZED_REQUEST, "You're not authorized to perform this operation.", "You're not authorized to perform this operation.");
+            if(r.getCredentials()==null || userManager.verify(r.getCredentials()) == null){
+                logger.log(Level.INFO, "Request from unauthorized user");
+                return new Result<>(ResultCode.UNAUTHORIZED_REQUEST, "You're not authorized to perform this operation.", null);
             }
             Command command = availableCommands.get(commandName);
             if (command == null) throw new AppException(ResultCode.COMMAND_NOT_FOUND, commandName);

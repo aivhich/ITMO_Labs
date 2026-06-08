@@ -31,8 +31,6 @@ public class AuthManagerImpl implements AuthManager{
         Credentials rCred = new Credentials(username, password);
         try {
             Response<Integer> response = (Response<Integer>) client.sendObject(new Request<>(CommandType.LOGIN, rCred));
-            System.out.println(response.getBody());
-            System.out.println(response.getResultCode());
             System.out.println(response.getMessage());
             if(response.getResultCode() == ResultCode.SUCCESS) {
                 credentials = rCred;

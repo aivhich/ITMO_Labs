@@ -25,13 +25,13 @@ public class MainServer {
     public static void main(String[] args) throws Exception {
         AtomicBoolean collectionWasSaved = new AtomicBoolean(false);
         if (args.length < 1) {
-            System.err.println("Использование: MainServer <port>");
+            System.err.println("Change config: MainServer [port]");
             System.exit(1);
         }
 
         int port = Integer.parseInt(args[0]);
 
-        logger.log(Level.INFO, "Запуск сервера на порту " + port);
+        logger.log(Level.INFO, "Server is starting on port: " + port);
 
         DataSource dataSource = DataSourceConfig.create(dbUrl, dbUser, dbPassword);
         UserManager userManager = new UserManagerImpl(dataSource);
@@ -81,18 +81,18 @@ public class MainServer {
                 )
         );
         Thread save = new Thread(() -> {
-            logger.log(Level.INFO, "Завершение работы сервера — сохраняем коллекцию ");
+            logger.log(Level.INFO, "Shutting down the server - saving the collection");
             try {
                 commandManager.run(new Request<>(CommandType.SAVE, new ArrayList()));
                 collectionWasSaved.set(true);
-                logger.log(Level.INFO, "Коллекция успешно сохранена");
+                logger.log(Level.INFO, "Collection saved successfully");
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Ошибка при сохранении коллекции: " + e.getMessage());
+                logger.log(Level.SEVERE, "Error saving collection: " + e.getMessage());
             }
         });
         Runtime.getRuntime().addShutdownHook(save);
 
-        logger.log(Level.INFO, "Сервер успешно инициализирован, ожидаю подключений...");
+        logger.log(Level.INFO, "The server has been successfully initialized, waiting for connections...");
 
         Server server = new Server(port, managersLocator);
         managersLocator.register(Server.class, server);

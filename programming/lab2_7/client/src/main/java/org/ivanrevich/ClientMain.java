@@ -2,15 +2,17 @@ package org.ivanrevich;
 
 import org.ivanrevich.commands.*;
 import org.ivanrevich.exceptions.AppException;
+import org.ivanrevich.exceptions.ErrorHandler;
 import org.ivanrevich.managers.*;
 import org.ivanrevich.network.Client;
 import org.ivanrevich.requests.CommandType;
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientMain {
     public static void main(String[] args) throws Exception {
-        boolean workMode = true;
+        AtomicBoolean workMode = new AtomicBoolean(true);
 
         ManagersLocator managersLocator = new ManagersLocator();
 
@@ -28,6 +30,7 @@ public class ClientMain {
         managersLocator.register(Client.class, client);
         managersLocator.register(CommandManager.class, commandManager);
 
+        ErrorHandler errorHandler = new ClientErrorHandler(managersLocator, ioManager, workMode);
 
         commandManager.registerNoAuthCommands(Map.of(
                 CommandType.SIGNUP.getName(), new Signup(managersLocator),
@@ -53,7 +56,7 @@ public class ClientMain {
                 )
         );
 
-        while (workMode) {
+        while (workMode.get()) {
             try {
                 IOManager io = managersLocator.get(IOManager.class);
                 String cmd = io.read();
@@ -64,35 +67,8 @@ public class ClientMain {
                 commandManager.run(cmd);
 
             } catch (AppException e) {
-                // Типизированные исключения приложения — switch по enum без проблем с константами
-                switch (e.getCode()) {
-                    case SCRIPT_END -> {
-                        IOManagerStack stack = managersLocator.get(IOManagerStack.class);
-                        stack.pop();
-                        managersLocator.register(IOManager.class, stack.current());
-                    }
-                    case SCRIPT_ERROR -> {
-                        IOManagerStack stack = managersLocator.get(IOManagerStack.class);
-                        stack.pop();
-                        managersLocator.register(IOManager.class, stack.current());
-                        ioManager.write("Ошибка выполнения скрипта");
-                    }
-                    case COMMAND_CANCELLED -> workMode = false;
-                    case COMMAND_NOT_FOUND ->
-                            ioManager.write("Команда не найдена. Введите 'help' для списка команд.");
-                    case COMMAND_PARSE_ERROR ->
-                            ioManager.write("Ошибка разбора команды");
-                    case RECURRENT_SCRIPT_ERROR ->
-                            ioManager.write("Обнаружена рекурсия скриптов");
-                    case MANY_INCORRECT_ATTEMPTS ->
-                            ioManager.write("Слишком много некорректных попыток ввода");
-                    case ID_ISN_EXIST ->
-                            ioManager.write("Элемент с таким id не существует");
-                    case FILE_NOT_FOUND ->
-                            ioManager.write("Файл недоступен. Проверьте путь и права доступа");
-                    default ->
-                            ioManager.write(e.getMessage());
-                }
+//                System.out.println(e.getMessage());
+                errorHandler.handle(e);
             } catch (RuntimeException e) {
                 String msg = e.getMessage();
                 ioManager.write(msg != null ? msg : "Неизвестная ошибка");

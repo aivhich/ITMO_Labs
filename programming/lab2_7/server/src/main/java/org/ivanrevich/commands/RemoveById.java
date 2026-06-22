@@ -36,6 +36,9 @@ public class RemoveById implements Command{
 
         try {
             int id = Integer.parseInt(String.valueOf(r.getArgs()));
+            if(queueManager.getById(id)==null){
+                return new Result<>(ResultCode.ID_ISN_EXIST, "Fail", (new AppException(ResultCode.ID_ISN_EXIST)).getMessage());
+            };
             if(!Objects.equals(queueManager.getOwnerById(id), userManager.getIdForUser(r.getCredentials()))) {
                 return new Result<>(ResultCode.HAVENT_OWNER_RULES,
                         "Exception while update vehicle. You haven't owner rules",

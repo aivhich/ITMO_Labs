@@ -100,7 +100,15 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof Vehicle vehicle)) return false;
-        return id == vehicle.id && numberOfWheels == vehicle.numberOfWheels && Objects.equals(name, vehicle.name) && Objects.equals(coordinates, vehicle.coordinates) && Objects.equals(creationDate, vehicle.creationDate) && Objects.equals(enginePower, vehicle.enginePower) && type == vehicle.type && fuelType == vehicle.fuelType && Objects.equals(authorId, vehicle.authorId);
+        return id == vehicle.id
+                && numberOfWheels == vehicle.numberOfWheels
+                && Objects.equals(name, vehicle.name)
+                && Objects.equals(coordinates, vehicle.coordinates)
+                && Objects.equals(creationDate, vehicle.creationDate)
+                && Objects.equals(enginePower, vehicle.enginePower)
+                && type == vehicle.type
+                && fuelType == vehicle.fuelType
+                && Objects.equals(authorId, vehicle.authorId);
     }
 
     @Override

@@ -165,4 +165,9 @@ public class IOManagerImpl implements IOManager {
     public String getFile() {
         return "IO";
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

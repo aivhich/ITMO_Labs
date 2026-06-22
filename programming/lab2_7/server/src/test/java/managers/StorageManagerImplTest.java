@@ -40,12 +40,6 @@ class StorageManagerImplTest {
         return v;
     }
 
-    /**
-     * StorageManagerImpl's constructor calls queueManager.set(load(path)) eagerly.
-     * For save()/load() round-trip tests we want an empty starting file, so we
-     * point at a not-yet-existing path (load() treats FileNotFoundException as
-     * "start empty", per the source).
-     */
     private StorageManagerImpl newManagerWithEmptyStart(QueueManager qm) {
         String emptyPath = tempDir.resolve("empty_start_" + System.nanoTime() + ".csv").toString();
         return new StorageManagerImpl(emptyPath, qm);
@@ -232,10 +226,6 @@ class StorageManagerImplTest {
         List<Vehicle> loaded = storage.load(file.toString());
 
         assertEquals(1, loaded.size());
-        // Note: the CSV parser here splits naively on "," without quote-awareness,
-        // so a comma-containing, quoted name will NOT round-trip perfectly.
-        // This test documents that current limitation rather than asserting
-        // an idealized round-trip.
         assertNotNull(loaded.get(0).getName());
     }
 }

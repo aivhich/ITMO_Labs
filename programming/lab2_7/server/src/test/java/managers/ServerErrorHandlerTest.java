@@ -29,6 +29,11 @@ class ServerErrorHandlerTest {
             public Float askFloat(String text) { return 0f; }
             public Integer askInt(String text) { return 0; }
             public <T> T askValue(T init, java.util.function.Supplier<T> input, java.util.function.Predicate<T> v) { return init; }
+
+            @Override
+            public void close() {
+
+            }
         };
     }
 

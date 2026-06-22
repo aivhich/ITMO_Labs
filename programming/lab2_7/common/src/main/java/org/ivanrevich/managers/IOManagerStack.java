@@ -40,7 +40,12 @@ public class IOManagerStack {
 
     public void pop() {
         if (stack.size() > 1) {
-            stack.pop();
+            IOManager io = stack.pop();
+            try {
+                io.close();
+            }catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

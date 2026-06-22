@@ -28,7 +28,6 @@ class VehicleModelTest {
         return v;
     }
 
-    // ─── compareTo ────────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("compareTo (enginePower then numberOfWheels)")
@@ -75,7 +74,6 @@ class VehicleModelTest {
         }
     }
 
-    // ─── equals / hashCode ────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("equals and hashCode")
@@ -104,8 +102,6 @@ class VehicleModelTest {
         void differentIdNotEqual() {
             Vehicle a = buildVehicle(1, 100f, 4);
             Vehicle b = buildVehicle(2, 100f, 4);
-            // equals checks name, coordinates, etc. but not id explicitly—ids differ only via field
-            // so they may still differ, confirm:
             assertNotEquals(a, b);
         }
 
@@ -121,8 +117,6 @@ class VehicleModelTest {
             assertNotEquals("string", buildVehicle(1, 100f, 4));
         }
     }
-
-    // ─── toCsvString ──────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("toCsvString")
@@ -160,8 +154,6 @@ class VehicleModelTest {
             assertTrue(csv.contains("\"A\"\"B\""));
         }
     }
-
-    // ─── toString ─────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("toString contains id and name")

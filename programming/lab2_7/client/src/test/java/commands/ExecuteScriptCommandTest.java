@@ -18,12 +18,6 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * ExecuteScript doesn't touch Client at all — it only pushes a new
- * FileIOManagerImpl onto the IOManagerStack and re-registers IOManager.
- * No mocking needed here; real IOManagerStack + a real temp file exercise
- * the actual push/registration logic end-to-end.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Client ExecuteScript Command Tests")
 class ExecuteScriptCommandTest {
@@ -46,6 +40,11 @@ class ExecuteScriptCommandTest {
             public Float askFloat(String text) { return 0f; }
             public Integer askInt(String text) { return 0; }
             public <T> T askValue(T init, java.util.function.Supplier<T> input, java.util.function.Predicate<T> v) { return init; }
+
+            @Override
+            public void close() {
+
+            }
         };
     }
 
@@ -67,17 +66,28 @@ class ExecuteScriptCommandTest {
     }
 
     @Test
-    @DisplayName("valid script file pushes new IOManager and registers it as current")
-    void validScriptPushesNewIOManager() throws Exception {
-        Path scriptFile = tempDir.resolve("script.txt");
-        Files.writeString(scriptFile, "show\nexit\n");
+    @DisplayName("nested script execution: outer script IOManager remains current after completion")
+    void nestedScriptExecutionLeavesOuterManagerCurrent() throws Exception {
 
-        ResultCode result = executeScript.run(new String[]{scriptFile.toString()});
+        Path script2 = tempDir.resolve("script2.txt");
+        Files.writeString(script2, "help\ninfo\n");
 
+        Path script1 = tempDir.resolve("script1.txt");
+        String script1Content = "help\n" +
+                "execute_script " + script2.toString() + "\n" +
+                "info\n";
+        Files.writeString(script1, script1Content);
+
+        ResultCode result = executeScript.run(new String[]{script1.toString()});
         assertEquals(ResultCode.SUCCESS, result);
-        assertEquals(scriptFile.toString(), locator.get(IOManager.class).getFile());
-        assertEquals(scriptFile.toString(), stack.current().getFile());
+
+        IOManager current = stack.current();
+        stack.pop();
+        assertNotNull(current);
+        assertEquals(script1.toString(), current.getFile(),"Текущий менеджер должен быть для внешнего скрипта");
     }
+
+
 
     @Test
     @DisplayName("non-existing script file propagates AppException(FILE_NOT_FOUND) from validator")

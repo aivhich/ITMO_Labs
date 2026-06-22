@@ -55,6 +55,36 @@ public class StorageManagerImpl implements StorageManager {
         }
     }
 
+    private List<String> parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (inQuotes) {
+                if (c == '"' && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    current.append('"');
+                    i++;
+                } else if (c == '"') {
+                    inQuotes = false;
+                } else {
+                    current.append(c);
+                }
+            } else {
+                if (c == '"') {
+                    inQuotes = true;
+                } else if (c == ',') {
+                    fields.add(current.toString());
+                    current.setLength(0);
+                } else {
+                    current.append(c);
+                }
+            }
+        }
+        fields.add(current.toString());
+        return fields;
+    }
+
     @Override
     public List<Vehicle> load(String path) {
         validateCollectionNewFile(path, ".csv", true);
@@ -74,7 +104,8 @@ public class StorageManagerImpl implements StorageManager {
                     continue;
                 }
 
-                String[] parts = line.split(",", -1);
+                List<String> partsList = parseCsvLine(line);
+                String[] parts = partsList.toArray(new String[0]);
                 if (parts.length < 9) continue;
 
                 try {

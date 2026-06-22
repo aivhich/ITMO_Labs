@@ -31,7 +31,7 @@ class LoginSignupLogoutCommandTest {
         locator.register(AuthManager.class, authManager);
     }
 
-    // ─── Login ────────────────────────────────────────────────────────────────
+    //  Login 
 
     @Test
     @DisplayName("Login with wrong arg count returns INVALID_REQUEST without calling AuthManager")
@@ -62,7 +62,7 @@ class LoginSignupLogoutCommandTest {
         assertEquals(ResultCode.INVALID_REQUEST, login.run(new String[]{"alice", "wrong"}));
     }
 
-    // ─── Signup ───────────────────────────────────────────────────────────────
+    //  Signup 
 
     @Test
     @DisplayName("Signup with wrong arg count returns INVALID_REQUEST without calling AuthManager")
@@ -93,7 +93,7 @@ class LoginSignupLogoutCommandTest {
         assertEquals(ResultCode.INVALID_REQUEST, signup.run(new String[]{"taken", "pw"}));
     }
 
-    // ─── Logout ───────────────────────────────────────────────────────────────
+    //  Logout 
 
     @Test
     @DisplayName("Logout delegates to AuthManager.logout and returns SUCCESS on true")

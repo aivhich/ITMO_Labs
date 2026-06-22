@@ -7,11 +7,6 @@ import org.ivanrevich.managers.UserManager;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Minimal in-memory UserManager test double.
- * Maps username -> userId. verify() succeeds only if the
- * Credentials' password equals "correct-password".
- */
 public class StubUserManager implements UserManager {
     private final Map<String, Integer> usernameToId = new HashMap<>();
     private int nextId = 1;
@@ -34,7 +29,7 @@ public class StubUserManager implements UserManager {
 
     @Override
     public void changePassword(Credentials old, String newPassword) {
-        // not needed for tests
+
     }
 
     @Override

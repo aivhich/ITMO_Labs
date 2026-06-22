@@ -37,17 +37,13 @@ class ReflectionMapperTest {
         public double getPrice() { return price; }
     }
 
-    /**
-     * Builds a dynamic proxy implementing ResultSet, backed by a row map.
-     * Only getObject(String) and next() are actually exercised by ReflectionMapper.
-     */
     private ResultSet fakeResultSet(Map<String, Object> row) {
         InvocationHandler handler = (proxy, method, args) -> {
             switch (method.getName()) {
                 case "getObject":
                     return row.get((String) args[0]);
                 case "next":
-                    return false; // single-row mapRow() test doesn't iterate
+                    return false;
                 default:
                     return defaultReturnValue(method.getReturnType());
             }
@@ -86,9 +82,9 @@ class ReflectionMapperTest {
     @DisplayName("mapRow() casts numeric types correctly (Integer -> int field)")
     void mapRowCastsNumericTypes() throws Exception {
         Map<String, Object> row = new HashMap<>();
-        row.put("id", 5L); // comes back as Long from some DB drivers
+        row.put("id", 5L);
         row.put("label", "X");
-        row.put("price", 1); // comes back as Integer instead of double
+        row.put("price", 1);
 
         EntityMetadata metadata = new MetadataExtractor().extract(Widget.class);
         ReflectionMapper mapper = new ReflectionMapper();
@@ -102,11 +98,8 @@ class ReflectionMapperTest {
     @Test
     @DisplayName("mapRow() throws OrmMappingException wrapping reflective errors")
     void mapRowWrapsErrors() {
-        // Entity without a no-arg constructor accessible via reflection cleanly will still work
-        // here since Widget has an implicit no-arg constructor; instead force a type mismatch
-        // that the caster cannot resolve by using an incompatible enum value.
         Map<String, Object> row = new HashMap<>();
-        row.put("id", "not-a-number"); // String cannot be cast to int by castIfNeeded
+        row.put("id", "not-a-number");
         row.put("label", "X");
         row.put("price", 1.0);
 

@@ -29,13 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Client Update is the trickiest client command: it first sends a SHOW
- * request to fetch the current collection, locates the target vehicle by id
- * client-side, prompts for new field values via VehicleFactory, then sends
- * a second UPDATE request. We mock Client.sendObject() to answer differently
- * depending on the request's CommandType.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Client Update Command Tests")
 class UpdateCommandTest {
@@ -79,7 +72,6 @@ class UpdateCommandTest {
         return v;
     }
 
-    /** Stub all "skip / keep old value" answers for the update-prompt flow. */
     private void scriptKeepAllOldValues() {
         lenient().when(ioManager.askString(anyString())).thenReturn("");
         lenient().when(ioManager.askFloat(anyString())).thenReturn(null);
@@ -129,10 +121,11 @@ class UpdateCommandTest {
         scriptKeepAllOldValues();
 
         Response r2 = new Response<>(ResultCode.SUCCESS, "ok", queue);
-        when(client.sendObject(argThat(r -> r.getCommandType() == CommandType.SHOW)))
+        when(client.sendObject(argThat(r -> r != null && r.getCommandType() == CommandType.SHOW)))
                 .thenReturn(r2);
-        when(client.sendObject(argThat(r -> r.getCommandType() == CommandType.UPDATE)))
+        when(client.sendObject(argThat(r -> r != null && r.getCommandType() == CommandType.UPDATE)))
                 .thenReturn(new Response<>(ResultCode.SUCCESS, "updated", null));
+
         when(authManager.authorizedUserId()).thenReturn(3);
 
         ResultCode result = updateCommand.run(new String[]{"5"});
@@ -140,8 +133,8 @@ class UpdateCommandTest {
         assertEquals(ResultCode.SUCCESS, result);
 
         ArgumentCaptor<Request<Vehicle>> captor = ArgumentCaptor.forClass(Request.class);
-        verify(client).sendObject(argThat(r -> r.getCommandType() == CommandType.UPDATE));
-        verify(client, times(2)).sendObject(any()); // SHOW + UPDATE
+        verify(client).sendObject(argThat(r -> r != null && r.getCommandType() == CommandType.UPDATE));
+        verify(client, times(2)).sendObject(any());
     }
 
     @Test

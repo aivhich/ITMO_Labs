@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * @see FileIOManagerImpl
  */
 
-public interface IOManager {
+public interface IOManager extends AutoCloseable{
     String getFile();
     String read();
     void write(String text);
@@ -36,4 +36,5 @@ public interface IOManager {
     <T> T askValue(T initValue,
                            Supplier<T> input,
                            Predicate<T> validator);
+
 }

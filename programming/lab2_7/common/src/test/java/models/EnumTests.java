@@ -50,9 +50,7 @@ class EnumTests {
     @Test
     @DisplayName("countGreaterThanFuelType logic: ordinal comparison")
     void ordinalComparison() {
-        // NUCLEAR(2) > MANPOWER(1) → true
         assertTrue(FuelType.NUCLEAR.ordinal() > FuelType.MANPOWER.ordinal());
-        // KEROSENE(0) > ANTIMATTER(4) → false
         assertFalse(FuelType.KEROSENE.ordinal() > FuelType.ANTIMATTER.ordinal());
     }
 }

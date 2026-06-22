@@ -27,15 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Client-side Add command tests.
- * <p>
- * {@link Client} is mocked with Mockito (it is a non-final concrete class,
- * so the default subclass-based mock maker handles it without issue).
- * User input is mocked at the IOManager level, mirroring the "ask one value
- * at a time" flow used by VehicleFactory.
- * </p>
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Client Add Command Tests")
 class AddCommandTest {
@@ -58,9 +49,6 @@ class AddCommandTest {
         locator.register(IOManager.class, ioManager);
         addCommand = new Add(locator);
 
-        // VehicleFactory.createVehicle() drives input exclusively through askValue();
-        // delegate to the real Supplier/Predicate so VehicleFactory's retry/validation
-        // logic still runs against our scripted ask* answers below.
         lenient().when(ioManager.askValue(any(), any(), any())).thenAnswer(invocation -> {
             java.util.function.Supplier<?> input = invocation.getArgument(1);
             java.util.function.Predicate validator = invocation.getArgument(2);

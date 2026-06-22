@@ -4,6 +4,7 @@ package org.ivanrevich.models;
 import org.ivanrevich.annotations.Column;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Модель координат.
@@ -51,5 +52,16 @@ public class Coordinates implements Serializable {
                 "x=" + x +
                 ", y=" + y +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Coordinates that)) return false;
+        return Objects.equals(x, that.x) && Objects.equals(y, that.y);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

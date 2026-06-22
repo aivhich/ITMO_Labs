@@ -212,7 +212,6 @@ class QueueManagerImplTest {
         Vehicle high = makeVehicle("High", 500f, 1);
         queueManager.add(high);
         queueManager.add(low);
-        // PriorityQueue natural order: lowest enginePower at head
         assertEquals("Low", queueManager.getLast().getName());
     }
 }

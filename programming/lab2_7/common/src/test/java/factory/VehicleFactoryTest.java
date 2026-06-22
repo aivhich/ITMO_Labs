@@ -14,17 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("VehicleFactory Tests")
 class VehicleFactoryTest {
-
-    /**
-     * createVehicle() asks, in order:
-     * 1. name
-     * 2. enginePower
-     * 3. numberOfWheels
-     * 4. type (int 1-4)
-     * 5. fuelType (int 1-5)
-     * 6. coordinates.x (via CoordinatesFactory)
-     * 7. coordinates.y (via CoordinatesFactory)
-     */
     @Test
     @DisplayName("createVehicle() with all valid input builds a fully populated Vehicle")
     void createVehicleHappyPath() {

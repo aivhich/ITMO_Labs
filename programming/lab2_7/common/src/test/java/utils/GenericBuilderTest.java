@@ -65,7 +65,7 @@ class GenericBuilderTest {
         GenericBuilder<Coordinates> b = GenericBuilder.of(Coordinates::new);
         Coordinates c1 = b.build();
         Coordinates c2 = b.build();
-        // each build creates a new instance
+
         assertNotSame(c1, c2);
     }
 

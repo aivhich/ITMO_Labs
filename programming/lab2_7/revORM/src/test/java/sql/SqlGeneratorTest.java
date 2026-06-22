@@ -62,7 +62,6 @@ class SqlGeneratorTest {
     void insertHasMatchingPlaceholders() {
         String sql = generator.buildInsert(metadata);
         long questionMarks = sql.chars().filter(c -> c == '?').count();
-        // title, amount = 2 non-generated columns
         assertEquals(2, questionMarks);
     }
 
@@ -91,7 +90,7 @@ class SqlGeneratorTest {
         assertTrue(sql.contains("title=?"));
         assertTrue(sql.contains("amount=?"));
         assertTrue(sql.contains("WHERE id = ?"));
-        assertFalse(sql.contains("id=?")); // id itself shouldn't be in SET clause
+        assertFalse(sql.contains("id=?"));
     }
 
     @Test

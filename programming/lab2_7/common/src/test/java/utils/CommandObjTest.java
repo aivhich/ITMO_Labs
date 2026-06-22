@@ -37,8 +37,6 @@ class CommandObjTest {
         String[] args = {"1"};
         CommandObj a = new CommandObj("remove_by_id", args);
         CommandObj b = new CommandObj("remove_by_id", args);
-        // Records compare by value; arrays compare by reference in records
-        // They share the same array reference here so equality holds
         assertEquals(a, b);
     }
 }

@@ -6,15 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for the static CommandManager.parseCommand() method
- * shared by both client and server CommandManager interfaces.
- * We test it through the server version (both are identical).
- */
 @DisplayName("CommandManager.parseCommand() Tests")
 class CommandManagerParseCommandTest {
 
-    // Using the server-side interface which has the static method
     @Test
     @DisplayName("single word command → name set, empty args")
     void singleWord() {
@@ -56,10 +50,7 @@ class CommandManagerParseCommandTest {
     @Test
     @DisplayName("blank command does not throw but returns empty-name token")
     void blankCommandBehavior() {
-        // split("  ") → [""] which has length 1 and name=""
-        // The implementation does NOT throw on blank; it returns a CommandObj with name=""
         CommandObj obj = org.ivanrevich.managers.CommandManager.parseCommand("   ");
-        // name is empty string (whitespace trimmed then split gives [""])
         assertNotNull(obj);
     }
 }

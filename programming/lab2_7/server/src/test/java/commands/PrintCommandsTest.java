@@ -105,7 +105,6 @@ class PrintCommandsTest {
         PrintAscending cmd = new PrintAscending(locator);
         Result<?> result = cmd.run(new Request<>(CommandType.PRINT_ASCENDING, null));
 
-        @SuppressWarnings("unchecked")
         List<Vehicle> sorted = (List<Vehicle>) result.getOutput();
         assertTrue(sorted.isEmpty());
     }

@@ -25,7 +25,6 @@ class CoordinatesFactoryTest {
     @Test
     @DisplayName("createCoordinates() retries on invalid x before accepting valid value")
     void createRetriesOnInvalidX() {
-        // First x = -500 (invalid, must be > -371), then valid x = 0
         ScriptedIOManager io = new ScriptedIOManager("-500", "0", "1.0");
         CoordinatesFactory factory = new CoordinatesFactory(io);
 
@@ -38,7 +37,6 @@ class CoordinatesFactoryTest {
     @Test
     @DisplayName("createCoordinates() retries on invalid y before accepting valid value")
     void createRetriesOnInvalidY() {
-        // x valid, then y = 500 (invalid, must be <= 376), then valid y = 100
         ScriptedIOManager io = new ScriptedIOManager("5.0", "500", "100");
         CoordinatesFactory factory = new CoordinatesFactory(io);
 
@@ -52,7 +50,6 @@ class CoordinatesFactoryTest {
     @DisplayName("updateCoordinates() with empty input keeps old x and y")
     void updateWithEmptyInputKeepsOld() {
         Coordinates old = new Coordinates(42.0, 24f);
-        // empty strings for both x and y -> parse fails -> askValue returns old value
         ScriptedIOManager io = new ScriptedIOManager("", "");
         CoordinatesFactory factory = new CoordinatesFactory(io);
 

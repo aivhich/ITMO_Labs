@@ -76,8 +76,6 @@ class RemoveHeadCommandTest {
 
         Result<?> result = removeHead.run(new String[]{});
 
-        // production code calls remove_head() twice in run(String[]) (bug in source),
-        // so by the time it returns, the queue should be empty
         assertEquals(0, queueManager.size());
         assertEquals(ResultCode.SUCCESS, result.getResultCode());
     }

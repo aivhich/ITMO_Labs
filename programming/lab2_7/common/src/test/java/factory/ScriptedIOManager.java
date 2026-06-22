@@ -9,15 +9,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-/**
- * A scripted IOManager test double.
- * <p>
- * Feed it a sequence of string answers via the constructor; each call to
- * read()/askString() pops the next answer off the queue. askInt/askFloat/etc.
- * parse the popped string the same way the production read() pipeline would.
- * write() calls are recorded for inspection.
- * </p>
- */
 public class ScriptedIOManager implements IOManager {
     private final Deque<String> answers;
     private final java.util.List<String> writtenLines = new java.util.ArrayList<>();
@@ -133,5 +124,10 @@ public class ScriptedIOManager implements IOManager {
             }
         }
         return value;
+    }
+
+    @Override
+    public void close() {
+
     }
 }

@@ -1,5 +1,6 @@
 package org.ivanrevich.managers;
 
+import org.ivanrevich.ManagersLocator;
 import org.ivanrevich.exceptions.AppException;
 import org.ivanrevich.utils.ResultCode;
 
@@ -19,8 +20,10 @@ import static org.ivanrevich.validators.FileValidator.validateScriptFile;
 public class FileIOManagerImpl implements IOManager {
     private final BufferedReader reader;
     private final String path;
+    ManagersLocator managersLocator;
 
     public FileIOManagerImpl(String path) {
+        this.managersLocator = managersLocator;
         validateScriptFile(path);
         this.path = path;
         try {
@@ -39,6 +42,7 @@ public class FileIOManagerImpl implements IOManager {
             String data = reader.readLine();
             if (data == null) {
                 System.out.println();
+                close();
                 throw new AppException(ResultCode.SCRIPT_END);
             }
             System.out.println(data);
@@ -131,5 +135,14 @@ public class FileIOManagerImpl implements IOManager {
     @Override
     public String getFile() {
         return path;
+    }
+
+    @Override
+    public void close() {
+        try {
+            reader.close();
+        }  catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

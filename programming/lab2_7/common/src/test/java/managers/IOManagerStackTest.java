@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("IOManagerStack Tests")
 class IOManagerStackTest {
 
-    /** Minimal stub IOManager for testing */
     private static IOManager stubIO(String filePath) {
         return new IOManager() {
             public String getFile() { return filePath; }
@@ -27,6 +26,11 @@ class IOManagerStackTest {
             public Float askFloat(String text) { return 0f; }
             public Integer askInt(String text) { return 0; }
             public <T> T askValue(T init, Supplier<T> input, Predicate<T> validator) { return init; }
+
+            @Override
+            public void close() {
+
+            }
         };
     }
 
@@ -65,14 +69,14 @@ class IOManagerStackTest {
     @Test
     @DisplayName("pop() on single element does nothing (base stays)")
     void popOnBaseDoesNothing() {
-        stack.pop(); // should not throw or remove base
+        stack.pop();
         assertSame(base, stack.current());
     }
 
     @Test
     @DisplayName("push() same file path throws AppException (recursion guard)")
     void pushDuplicateFileThrows() {
-        IOManager duplicate = stubIO("IO"); // same file as base
+        IOManager duplicate = stubIO("IO");
         assertThrows(AppException.class, () -> stack.push(duplicate));
     }
 

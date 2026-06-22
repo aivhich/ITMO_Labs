@@ -26,7 +26,6 @@ class ServerCommandManagerImplTest {
     private StubUserManager userManager;
     private CommandManagerImpl commandManager;
 
-    /** Dummy command that records whether it ran and what it returns. */
     static class DummyCommand implements Command {
         boolean ran = false;
         ResultCode codeToReturn = ResultCode.SUCCESS;
